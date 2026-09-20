@@ -420,10 +420,10 @@
                     return response.headers;
                 }.bind(this));
             },
-            doTransfersPost: function (conventId, TransferType) {
+            doTransfersPost: function (conventId, transferType) {
                 this.$.transfersPost.set('body', this._formatBody({
                     conventId: conventId,
-                    TransferType: TransferType
+                    transfer: transferType
                 }));
                 return this.$.transfersPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
                     this.unshift('transfers', response.data.transfer);

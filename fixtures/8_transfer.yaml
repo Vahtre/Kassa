@@ -1,0 +1,10 @@
+# Transfer
+
+App\Entity\Transfer:
+    Transfer_1:
+        member: '@Member_2123'
+        convent: '@Convent_6'
+        sum: '5.00'
+        comment: 'Test transfer'
+        createdBy: '@Member_2122'
+        createdAtString: '2016-01-18 10:00:00'
