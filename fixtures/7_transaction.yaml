@@ -1,0 +1,23 @@
+# Transaction
+
+App\Entity\Transaction:
+    Transaction_1:
+        type: 'CREDIT_PURCHASE'
+        product: '@Product_1'
+        member: '@Member_2123'
+        createdBy: '@Member_2123'
+        convent: '@Convent_6'
+        count: 2
+        currentPrice: '1.00'
+        sum: '2.00'
+        createdAtString: '2016-01-15 12:00:00'
+    Transaction_2:
+        type: 'CREDIT_PURCHASE'
+        product: '@Product_2'
+        member: '@Member_2123'
+        createdBy: '@Member_2123'
+        convent: '@Convent_6'
+        count: 1
+        currentPrice: '1.50'
+        sum: '1.50'
+        createdAtString: '2016-01-16 13:00:00'

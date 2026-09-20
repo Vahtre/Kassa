@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Exception\OutOfCreditException;
 use App\Repository\MemberCreditRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'ollekassa_member_credit')]
 class MemberCredit
 {
+    public const STATUS_NEGATIVE = 'negative';
+    public const STATUS_NULL = 'null';
+    public const STATUS_POSITIVE = 'positive';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -78,6 +82,44 @@ class MemberCredit
     public function setComment(?string $comment): static
     {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getCreditStatus(): string
+    {
+        $credit = (float)$this->getCredit();
+
+        if ($credit > 0) {
+            return self::STATUS_POSITIVE;
+        }
+
+        if ($credit < 0) {
+            return self::STATUS_NEGATIVE;
+        }
+
+        return self::STATUS_NULL;
+    }
+
+    /**
+     * @throws OutOfCreditException
+     */
+    public function adjustCredit(float $amount, ?float $creditLimit = null): static
+    {
+        $currentCredit = (float)$this->getCredit();
+        $newCredit = round($currentCredit + $amount, 2);
+
+        if ($creditLimit !== null) {
+            // The MemberCredit is per convent. Compare total credit against the credit limit
+            $totalCredit = $this->getMember()->getTotalCredit();
+            $newTotalCredit = round($totalCredit + $amount, 2);
+
+            if ($newTotalCredit < $creditLimit) {
+                throw new OutOfCreditException($newTotalCredit, $creditLimit);
+            }
+        }
+
+        $this->setCredit((string)$newCredit);
 
         return $this;
     }

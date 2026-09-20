@@ -2,12 +2,18 @@
 
 namespace Rotalia\API\Controller;
 
+use App\Entity\Member;
+use App\Entity\PointOfSale;
 use App\Entity\User;
+use App\Repository\PointOfSaleRepository;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
@@ -85,5 +91,57 @@ class DefaultController extends AbstractController
         if (!$this->isGranted(User::ROLE_USER)) {
             throw new AccessDeniedHttpException();
         }
+    }
+
+    /**
+     * The current authenticated Member, or null when not logged in (e.g. an anonymous point of
+     * sale request).
+     */
+    protected function getMemberOrNull(): ?Member
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        return $user?->getMember();
+    }
+
+    /**
+     * The PointOfSale for the current request's "pos_hash" cookie, if any.
+     */
+    protected function getPos(Request $request, PointOfSaleRepository $pointOfSaleQuery): ?PointOfSale
+    {
+        $hash = $request->cookies->get('pos_hash');
+
+        if (!$hash) {
+            return null;
+        }
+
+        return $pointOfSaleQuery->findOneBy(['hash' => $hash]);
+    }
+
+    /**
+     * Applies limit/offset to the query (0/null limit means "no limit") and returns the
+     * "offset-end/total" Content-Range header value the frontend's pagination footers expect
+     * (see kassa-admin-aruanded.html, kassa-admin-ostud.html, etc).
+     */
+    protected function limitQuery(QueryBuilder $query, ?int $limit, int $offset): string
+    {
+        $rowCount = (new Paginator($query))->count();
+
+        if ($offset >= $rowCount) {
+            $offset = 0;
+        }
+
+        if ($limit) {
+            $limit = min($limit, $rowCount);
+            $query
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+            ;
+        } else {
+            $limit = $rowCount;
+        }
+
+        return sprintf('%d-%d/%d', $offset, $offset + $limit, $rowCount);
     }
 }

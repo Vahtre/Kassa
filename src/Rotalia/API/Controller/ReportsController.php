@@ -62,8 +62,6 @@ class ReportsController extends DefaultController
             ->andWhere('r.conventId = :conventId')
             ->setParameter('conventId', $activeConventId)
             ->orderBy('r.createdAt', 'DESC')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
         ;
 
         if (!empty($memberName)) {
@@ -100,10 +98,12 @@ class ReportsController extends DefaultController
             $query->andWhere('r.type = :type')->setParameter('type', $reportType);
         }
 
+        $contentRange = $this->limitQuery($query, $limit, $offset);
+
         /** @var Report[] $reports */
         $reports = $query->getQuery()->getResult();
 
-        return $this->json(['reports' => $reports]);
+        return $this->json(['reports' => $reports], 200, ['Content-Range' => 'reports ' . $contentRange]);
     }
 
     /**

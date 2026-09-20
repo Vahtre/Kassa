@@ -105,8 +105,13 @@ class Member
 
     public function getTotalCredit(): float
     {
-        // TODO: get from MemberCredit
-        return 0;
+        $total = 0.0;
+
+        foreach ($this->getMemberCredits() as $memberCredit) {
+            $total += (float)$memberCredit->getCredit();
+        }
+
+        return $total;
     }
 
     public function getConvent(): ?Convent

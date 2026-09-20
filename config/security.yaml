@@ -18,7 +18,7 @@ security:
 
     access_control:
         - { path: ^/api/authentication, roles: PUBLIC_ACCESS }
-#        - { path: ^/api/purchase, roles: PUBLIC_ACCESS }
+        - { path: ^/api/purchase, roles: PUBLIC_ACCESS }
 #        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
 #        - { path: ^/kassa, role: PUBLIC_ACCESS }
