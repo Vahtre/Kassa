@@ -439,9 +439,9 @@
                     return response.headers;
                 }.bind(this));
             },
-            doCreditNettingsPatch: function (conventId, creditNettingId, CreditNettingRowType) {
+            doCreditNettingsPatch: function (conventId, creditNettingId, creditNettingRowType) {
                 this.$.creditNettingsPatch.set('body', this._formatBody({
-                    CreditNettingRowType: CreditNettingRowType,
+                    creditNettingRow: creditNettingRowType,
                     conventId: conventId
                 }));
                 this.set('_id', creditNettingId);

@@ -1,0 +1,17 @@
+# CreditNetting, CreditNettingRow
+
+App\Entity\CreditNetting:
+    CreditNetting_1:
+        createdAtString: '2016-01-20 00:00:00'
+
+App\Entity\CreditNettingRow:
+    CreditNettingRow_1:
+        creditNetting: '@CreditNetting_1'
+        convent: '@Convent_6'
+        sum: '5.00'
+        nettingDone: 0
+    CreditNettingRow_2:
+        creditNetting: '@CreditNetting_1'
+        convent: '@Convent_7'
+        sum: '-5.00'
+        nettingDone: 0
