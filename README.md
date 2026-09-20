@@ -43,18 +43,20 @@ LoadModule rewrite_module modules/mod_rewrite.so
 Database
 --------
 
-Build database if needed or run sql manually
-```
-mysql> create database kassa
-```
-Create database tables by running all statements in default.sql:
+Create the database:
 ```bash
-mysql < app/propel/sql/default.sql
+php bin/console doctrine:database:create
 ```
 
-Run migrations
+Create the schema from the Doctrine entity mappings. There are no migrations on this branch yet
+(see `migrations/`), so the schema is created directly from `src/App/Entity`:
 ```bash
-php bin/console TODO for doctrine
+php bin/console doctrine:schema:create
+```
+
+Once migrations exist, use those instead to keep the schema up to date:
+```bash
+php bin/console doctrine:migrations:migrate
 ```
 
 Build frontend - bower installs packages, polymer builds code
@@ -66,9 +68,9 @@ bower update
 polymer build
 ```
 
-Deploy new version: composer install, propel build, assets install, bower install, polymer build
+Deploy new version: composer install, cache clear, bower install, polymer build
 ```bash
-sh build.sh # TODO: Doctrine
+sh build.sh
 ```
 
 Testing
@@ -77,13 +79,7 @@ Testing
 Run unit and functional tests with PHPUnit
 
 ```bash
-php bin/phpunit tests
-```
-
-See coverage:
-```bash
-cd tests/coverage/Rotalia/API
-open index.html
+php bin/phpunit
 ```
 
 Add fields to a model:

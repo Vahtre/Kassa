@@ -7,7 +7,9 @@ else
     php83-cli ../composer.phar install
 fi
 
-# php app/console propel:build
+# TODO: once migrations/ is populated, run `php bin/console doctrine:migrations:migrate --no-interaction`
+# here to bring the production schema up to date.
+php bin/console cache:clear --env=prod
 
 # shellcheck disable=SC2164
 cd src/Rotalia/FrontendBundle/Resources/source/

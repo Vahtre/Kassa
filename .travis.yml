@@ -4,23 +4,23 @@ services:
   - mysql
 
 php:
-  - 7.4
+  - 8.2
   - 8.3
 
 env:
-  - DB=mysql SYMFONY_ENV=travis
+  - APP_ENV=test
 
 install:
   - composer install
-  - php app/console propel:build
   - npm install -g bower polymer-cli@"^1.6.0"
   - cd src/Rotalia/FrontendBundle/Resources/source/
   - bower install
   - polymer build
   - cd $TRAVIS_BUILD_DIR
-  # Propel
-  - php app/console propel:database:create
-  - php app/console propel:sql:insert --force
+  # Doctrine: no migrations exist yet on this branch, so the schema is created straight from
+  # the entity mappings. Switch to `doctrine:migrations:migrate` once migrations/ is populated.
+  - php bin/console doctrine:database:create --env=test
+  - php bin/console doctrine:schema:create --env=test
 
 script:
-  - vendor/bin/phpunit -c app/ src
+  - vendor/bin/phpunit
