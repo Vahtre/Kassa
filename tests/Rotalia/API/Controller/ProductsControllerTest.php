@@ -38,17 +38,18 @@ class ProductsControllerTest extends ControllerTestCase
     {
         $this->loginSimpleUser(); // Tallinn convent
 
-        /** @var Product $alexander */
-        $alexander = FixtureStore::getFixtures()['Product_2'];
-        /** @var ProductInfo $alexanderTallinn */
-        $alexanderTallinn = FixtureStore::getFixtures()['ProductInfo_3'];
+        // Ordered by Tallinn's own sequence number: Premium (seq 1) comes before Aleksander (seq 2)
+        /** @var Product $premium */
+        $premium = FixtureStore::getFixtures()['Product_1'];
+        /** @var ProductInfo $premiumTallinn */
+        $premiumTallinn = FixtureStore::getFixtures()['ProductInfo_1'];
 
         static::$client->request('GET', '/api/products');
         $response = static::$client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertResponseEqualsJsonPath($alexander->getName(), 'data.products.0.name');
-        $this->assertResponseEqualsJsonPath($alexanderTallinn->getStatus(), 'data.products.0.status');
-        $this->assertResponseEqualsJsonPath($alexanderTallinn->getPrice(), 'data.products.0.price');
+        $this->assertResponseEqualsJsonPath($premium->getName(), 'data.products.0.name');
+        $this->assertResponseEqualsJsonPath($premiumTallinn->getStatus(), 'data.products.0.status');
+        $this->assertResponseEqualsJsonPath($premiumTallinn->getPrice(), 'data.products.0.price');
     }
 
     public function testListSuccessOtherConvent(): void
@@ -61,6 +62,7 @@ class ProductsControllerTest extends ControllerTestCase
         ]);
         $response = static::$client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
+        // Aleksander has seq 1 for Tartu (but seq 2 for Tallinn), so it leads here but not in testListSuccess
         $this->assertResponseEqualsJsonPath('A le Coq Aleksander', 'data.products.0.name');
         // Status is different for Tartu
         $this->assertResponseEqualsJsonPath(ProductStatus::DISABLED->value, 'data.products.0.status');
@@ -185,6 +187,7 @@ class ProductsControllerTest extends ControllerTestCase
             'productGroup' => $beer->getId(),
             'warehouseCount' => null,
             'storageCount' => null,
+            'seq' => 1, // Default seq for the newly created Tartu ProductInfo
             'id' => 5, // Update when adding Products to 2_product.yaml
         ], 'data.product');
         $this->assertEquals(201, $response->getStatusCode());

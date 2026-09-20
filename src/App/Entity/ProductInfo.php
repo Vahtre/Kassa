@@ -39,6 +39,9 @@ class ProductInfo
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $resourceType = ProductResourceType::LIMITED->value;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $seq = 1;
+
     private ?Convent $convent = null;
 
     public function getId(): ?int
@@ -126,6 +129,18 @@ class ProductInfo
     public function setResourceType(?string $resourceType): static
     {
         $this->resourceType = $resourceType;
+
+        return $this;
+    }
+
+    public function getSeq(): ?int
+    {
+        return $this->seq;
+    }
+
+    public function setSeq(?int $seq): static
+    {
+        $this->seq = $seq;
 
         return $this;
     }

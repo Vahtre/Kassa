@@ -65,6 +65,7 @@ class ProductType extends BaseFormType
                 ],
             ])
             ->add('warehouseCount', NumberType::class)
-            ->add('storageCount', NumberType::class);
+            ->add('storageCount', NumberType::class)
+            ->add('seq', IntegerType::class);
     }
 }

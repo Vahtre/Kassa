@@ -53,8 +53,8 @@ class ProductsController extends DefaultController
 
         $offset = ($page - 1) * $limit;
         $query = $productQuery->createQueryBuilder('p');
+        $productQuery->orderBySeqForConvent($query, $activeConventId);
         $query
-            ->orderBy('p.name')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
         ;
@@ -141,6 +141,7 @@ class ProductsController extends DefaultController
                     ->setProduct($product)
                     ->setConvent($convent)
                     ->setPrice($product->getPrice()) // use the same price
+                    ->setSeq($product->getSeq()) // use the same sequence number
                     ->setStatus(ProductStatus::DISABLED->value) // but set disabled
                 ;
                 $em->persist($productInfo);

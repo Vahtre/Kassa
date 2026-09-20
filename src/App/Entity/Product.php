@@ -37,7 +37,7 @@ class Product implements JsonSerializable
     private string $status; // TODO: remove from database
 
     #[ORM\Column(nullable: true)]
-    private ?int $seq = null;
+    private ?int $seq = null; // TODO: remove from database
 
     /**
      * @var Collection<int, ProductInfo>
@@ -139,12 +139,12 @@ class Product implements JsonSerializable
 
     public function getSeq(): ?int
     {
-        return $this->seq;
+        return $this->getActiveProductInfo()->getSeq();
     }
 
     public function setSeq(?int $seq): static
     {
-        $this->seq = $seq;
+        $this->getActiveProductInfo()->setSeq($seq);
 
         return $this;
     }
@@ -256,6 +256,7 @@ class Product implements JsonSerializable
             'warehouseCount' => $this->getWarehouseCount(),
             'storageCount' => $this->getStorageCount(),
             'resourceType' => $this->getResourceType(),
+            'seq' => $this->getSeq(),
         ];
     }
 }
