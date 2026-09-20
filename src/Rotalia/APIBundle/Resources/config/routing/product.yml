@@ -1,9 +1,0 @@
-RotaliaAPI_products_post:
-    path:  /products/
-    methods: [POST]
-    defaults: { _controller: Rotalia\APIBundle\Controller\ProductsController::PostAction }
-
-RotaliaAPI_products_patch:
-    path:  /products/{id}/
-    methods: [PATCH]
-    defaults: { _controller: Rotalia\APIBundle\Controller\ProductsController::PatchAction }

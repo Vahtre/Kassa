@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;

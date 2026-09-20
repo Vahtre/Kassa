@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Rotalia\API\Controller\AuthenticationController;
 use Rotalia\API\Services\Security\AuthenticationFailureHandler;
 use Rotalia\API\Services\Security\UserLastLoginUpdater;
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\Helpers\ControllerTestCase;
 use Tests\Helpers\EntityManagerAwareTestCase;

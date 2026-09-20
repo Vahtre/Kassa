@@ -1,4 +1,0 @@
-RotaliaAPI_economyReport_get:
-    path:  /economyReport/
-    methods: [GET]
-    defaults: { _controller: Rotalia\APIBundle\Controller\EconomyReportController::GetAction }

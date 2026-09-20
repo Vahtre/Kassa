@@ -286,8 +286,9 @@ class Report implements JsonSerializable
     /**
      * Basic fields for the report.
      *
-     * TODO: 'deficit' requires porting Rotalia\APIBundle\Classes\Updates (inventory delta
-     * calculation) to Doctrine; stubbed to 0 until that follow-up lands.
+     * TODO: 'deficit' requires porting the old Propel Updates class (inventory delta
+     * calculation, see Rotalia\APIBundle\Classes\Updates on the master branch / pre-Doctrine
+     * git history) to Doctrine; stubbed to 0 until that follow-up lands.
      */
     public function jsonSerialize(): array
     {

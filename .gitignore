@@ -1,21 +1,10 @@
-/web/bundles/
-/web/1/
-/web/app.php
-/app/bootstrap.php.cache
-/app/cache/
 /config/parameters.*.yaml
-/app/logs/
-!app/cache/.gitkeep
-!app/logs/.gitkeep
 /build/
 /intra/
-/src/Rotalia/*Bundle/Model/map/
-/src/Rotalia/*Bundle/Model/om/
 /src/Rotalia/FrontendBundle/Resources/source/bower_components/
 /src/Rotalia/FrontendBundle/Resources/source/build/
 /composer.phar
 .idea/
-app/propel/generated-schemas/
 .directory
 .DS_Store
 

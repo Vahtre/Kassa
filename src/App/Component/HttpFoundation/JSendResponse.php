@@ -1,6 +1,6 @@
 <?php
 
-namespace Rotalia\APIBundle\Component\HttpFoundation;
+namespace App\Component\HttpFoundation;
 
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,8 +13,6 @@ use Throwable;
  *      JSendResponse::createFail($data, 500);
  *      JSendResponse::createError($message, 403);
  *
- * @package Rotalia\APIBundle\Component\HttpFoundation
- * @author Jaak Tamre
  * @see http://labs.omniti.com/labs/jsend
  */
 class JSendResponse extends JsonResponse

@@ -6,7 +6,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rotalia\API\Services\Security\AuthenticationFailureHandler;
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;

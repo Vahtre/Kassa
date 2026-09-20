@@ -2,7 +2,7 @@
 
 namespace Rotalia\API\Services;
 
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 /**
  * Class ExceptionListener
  * Catches exceptions and returns JSendResponse instead of default error page
- *
- * @package Rotalia\APIBundle\Controller
  */
 #[AsEventListener(event: ExceptionEvent::class, method: 'onKernelException', priority: 20)]
 class ExceptionListener

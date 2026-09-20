@@ -1,4 +1,0 @@
-RotaliaAPI_members_list:
-    path:  /members/
-    methods: [GET]
-    defaults: { _controller: Rotalia\APIBundle\Controller\MembersController::ListAction }

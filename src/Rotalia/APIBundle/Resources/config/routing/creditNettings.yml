@@ -1,9 +1,0 @@
-RotaliaAPI_creditNettings_list:
-    path:  /creditNettings/
-    methods: [GET]
-    defaults: { _controller: Rotalia\APIBundle\Controller\CreditNettingsController::ListAction }
-
-RotaliaAPI_creditNettings_update:
-    path:  /creditNettings/{id}/
-    methods: [PATCH]
-    defaults: { _controller: Rotalia\APIBundle\Controller\CreditNettingsController::PatchAction }

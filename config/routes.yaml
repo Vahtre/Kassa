@@ -1,8 +1,3 @@
-#rotalia_api:
-#    resource: "@RotaliaAPIBundle/Resources/config/routing"
-#    prefix:   /api/
-#    type: directory
-
 rotalia_api:
     resource:
         path: ../src/Rotalia/API/Controller/

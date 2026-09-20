@@ -7,7 +7,7 @@ use App\Repository\ProductGroupRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use App\Form\FormHelper;
 use App\Form\ProductGroupType;
 use Symfony\Component\HttpFoundation\JsonResponse;

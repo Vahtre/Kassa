@@ -1,9 +1,0 @@
-RotaliaAPI_transfer_list:
-    path:  /transfers/
-    methods: [GET]
-    defaults: { _controller: Rotalia\APIBundle\Controller\TransfersController::ListAction }
-
-RotaliaAPI_transfer_create:
-    path:  /transfers/
-    methods: [POST]
-    defaults: { _controller: Rotalia\APIBundle\Controller\TransfersController::PostAction }

@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Rotalia\API\Controller\DefaultController;
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\JsonResponse;

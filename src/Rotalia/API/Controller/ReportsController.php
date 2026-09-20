@@ -13,7 +13,7 @@ use App\Repository\ReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Rotalia\APIBundle\Component\HttpFoundation\JSendResponse;
+use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -24,7 +24,8 @@ use Throwable;
  * TODO: this is a partial port. Report creation here does not yet reproduce the old Propel
  * behaviour's side effects: it does not write ReportRow counts back into Product warehouse/
  * storage counts (Report::saveProductCounts), does not auto-create a cash-out UPDATE report,
- * and does not compute profit/deficit (which needs the Rotalia\APIBundle\Classes\Updates port).
+ * and does not compute profit/deficit (which needs the old Propel Updates class ported - see
+ * Rotalia\APIBundle\Classes\Updates on the master branch / pre-Doctrine git history).
  * See App\Entity\Report's docblocks for the exact gaps. Economy reports are not ported at all yet.
  */
 class ReportsController extends DefaultController
