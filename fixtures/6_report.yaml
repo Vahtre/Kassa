@@ -1,0 +1,29 @@
+# Report, ReportRow
+
+App\Entity\Report:
+    Report_1:
+        member: '@Member_1886'
+        convent: '@Convent_6'
+        cash: '10.00'
+        type: 'VERIFICATION'
+        target: 'storage'
+        createdAtString: '2016-01-10 20:00:00'
+    Report_2:
+        member: '@Member_2122'
+        convent: '@Convent_6'
+        cash: '15.50'
+        type: 'VERIFICATION'
+        target: 'storage'
+        createdAtString: '2016-01-17 21:00:00'
+
+App\Entity\ReportRow:
+    ReportRow_1:
+        report: '@Report_1'
+        product: '@Product_1'
+        count: 10
+        currentPrice: '1.00'
+    ReportRow_2:
+        report: '@Report_2'
+        product: '@Product_1'
+        count: 8
+        currentPrice: '1.00'

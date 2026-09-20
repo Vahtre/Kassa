@@ -13,6 +13,14 @@ use JsonSerializable;
 #[ORM\Table(name: 'ollekassa_product')]
 class Product implements JsonSerializable
 {
+    public const INVENTORY_TYPE_WAREHOUSE = 'warehouse';
+    public const INVENTORY_TYPE_STORAGE = 'storage';
+
+    public static array $inventoryTypes = [
+        self::INVENTORY_TYPE_WAREHOUSE,
+        self::INVENTORY_TYPE_STORAGE,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
