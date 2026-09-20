@@ -1,0 +1,17 @@
+# PointOfSale
+
+App\Entity\PointOfSale:
+    PointOfSale_1:
+        name: 'Tallinna kassa'
+        hash: abcdef1234567890abcdef1234567890
+        deviceInfo: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'
+        createdAtString: '2016-01-17 22:02:57'
+        createdBy: '@Member_1886'
+        convent: '@Convent_6'
+    PointOfSale_2:
+        name: 'Tartu kassa'
+        hash: '1234567890abcdef1234567890abcdef'
+        deviceInfo: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        createdAtString: '2016-02-01 09:12:34'
+        createdBy: '@Member_2122'
+        convent: '@Convent_7'

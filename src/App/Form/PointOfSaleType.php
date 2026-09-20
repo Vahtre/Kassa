@@ -2,34 +2,24 @@
 
 namespace App\Form;
 
-use Symfony\Component\Form\AbstractType;
+use App\Entity\PointOfSale;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-class PointOfSaleType extends AbstractType
+class PointOfSaleType extends BaseFormType
 {
-    /**
-     * {@inheritdoc}
-     */
+    public static string $modelClass = PointOfSale::class;
+    public static string $modelName = 'pointOfSale';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', 'text', [
-                'label' => 'Nimi',
-                'required' => true,
+            ->add('name', TextType::class, [
+                'constraints' => [
+                    new NotBlank(message: 'Sisesta nimi'),
+                ],
             ])
         ;
-    }
-
-    public function getBlockPrefix(): string
-    {
-        return 'PointOfSaleType';
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'Rotalia\APIBundle\Model\PointOfSale',
-        ));
     }
 }

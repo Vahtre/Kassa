@@ -290,19 +290,19 @@
                     return response.headers;
                 }.bind(this));
             },
-            doPointOfSalesPost: function (conventId, PointOfSaleType) {
+            doPointOfSalesPost: function (conventId, pointOfSaleType) {
                 this.$.pointOfSalesPost.set('body', this._formatBody({
                     conventId: conventId,
-                    PointOfSaleType: PointOfSaleType
+                    pointOfSale: pointOfSaleType
                 }));
                 return this.$.pointOfSalesPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
                     this.push('pointOfSales', response.data.pointOfSale);
                     this.fire('kassa-message-success', 'Müügipunkt edukalt lisatud');
                 }.bind(this));
             },
-            doPointOfSalesPatch: function (pointOfSaleId, PointOfSaleType) {
+            doPointOfSalesPatch: function (pointOfSaleId, pointOfSaleType) {
                 this.$.pointOfSalesPatch.set('body', this._formatBody({
-                    PointOfSaleType: PointOfSaleType
+                    pointOfSale: pointOfSaleType
                 }));
                 this.set('_id', pointOfSaleId);
                 return this.$.pointOfSalesPatch.generateRequest().completes.then(this._checkSuccess).then(function (response) {
