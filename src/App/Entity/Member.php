@@ -215,4 +215,18 @@ class Member
 
         return $this;
     }
+
+    /**
+     * @param bool $includeCredit Whether to include the (potentially sensitive) credit balance -
+     * the caller decides based on the requesting user's permissions.
+     */
+    public function getAjaxData(bool $includeCredit = false): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getFullName(),
+            'conventId' => $this->getConventId(),
+            'creditBalance' => $includeCredit ? $this->getTotalCredit() : null,
+        ];
+    }
 }
