@@ -15,4 +15,21 @@ class MemberRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Member::class);
     }
+
+    /**
+     * @param int[] $conventIds
+     * @return int[]
+     */
+    public function findIdsByConventIds(array $conventIds): array
+    {
+        $rows = $this->createQueryBuilder('m')
+            ->select('m.id')
+            ->andWhere('m.conventId IN (:conventIds)')
+            ->setParameter('conventIds', $conventIds)
+            ->getQuery()
+            ->getScalarResult()
+        ;
+
+        return array_map(static fn (array $row) => (int)$row['id'], $rows);
+    }
 }

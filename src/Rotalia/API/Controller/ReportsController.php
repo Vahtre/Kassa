@@ -2,7 +2,9 @@
 
 namespace Rotalia\API\Controller;
 
+use App\Component\HttpFoundation\JSendResponse;
 use App\Entity\Convent;
+use App\Entity\Enum\ProductResourceType;
 use App\Entity\Product;
 use App\Entity\Report;
 use App\Entity\ReportRow;
@@ -10,24 +12,17 @@ use App\Entity\User;
 use App\Repository\ConventRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ReportRepository;
+use App\Service\Updates;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use App\Component\HttpFoundation\JSendResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Throwable;
 
-/**
- * TODO: this is a partial port. Report creation here does not yet reproduce the old Propel
- * behaviour's side effects: it does not write ReportRow counts back into Product warehouse/
- * storage counts (Report::saveProductCounts), does not auto-create a cash-out UPDATE report,
- * and does not compute profit/deficit (which needs the old Propel Updates class ported - see
- * Rotalia\APIBundle\Classes\Updates on the master branch / pre-Doctrine git history).
- * See App\Entity\Report's docblocks for the exact gaps. Economy reports are not ported at all yet.
- */
 class ReportsController extends DefaultController
 {
     /**
@@ -38,6 +33,7 @@ class ReportsController extends DefaultController
     #[Route('/reports', methods: ['GET'])]
     public function list(
         ReportRepository $reportQuery,
+        Updates $updates,
         #[MapQueryParameter] ?string $memberName = null,
         #[MapQueryParameter] ?string $dateFrom = null,
         #[MapQueryParameter] ?string $dateUntil = null,
@@ -104,6 +100,10 @@ class ReportsController extends DefaultController
         /** @var Report[] $reports */
         $reports = $query->getQuery()->getResult();
 
+        foreach ($reports as $report) {
+            $report->setDeficit($updates->calculateDeficit($report));
+        }
+
         return $this->json(['reports' => $reports], 200, ['Content-Range' => 'reports ' . $contentRange]);
     }
 
@@ -117,6 +117,7 @@ class ReportsController extends DefaultController
     #[Route('/reports/{id}', methods: ['GET'], requirements: ['id' => '-?\d+'])]
     public function get(
         ReportRepository $reportQuery,
+        Updates $updates,
         Request $request,
         int $id,
     ): JsonResponse
@@ -133,10 +134,17 @@ class ReportsController extends DefaultController
 
             $report = $reportQuery->findLatestVerificationReport($conventId, $target);
 
-            // TODO: 'updates' (inventory delta since this report) requires the Updates class port
+            $reportUpdates = $report === null ? null : $updates->getUpdatesBetweenReports(
+                $target,
+                $conventId,
+                ProductResourceType::LIMITED->value,
+                $report,
+                null,
+            );
+
             return $this->json([
                 'report' => $report?->getFullAjaxData(),
-                'updates' => null,
+                'updates' => $reportUpdates,
             ]);
         }
 
@@ -151,12 +159,20 @@ class ReportsController extends DefaultController
         }
 
         if ($report->getType() === Report::TYPE_VERIFICATION) {
-            $report->setPreviousVerification($reportQuery->findPreviousVerificationReport($report));
+            $previousVerification = $reportQuery->findPreviousVerificationReport($report);
+            $report->setPreviousVerification($previousVerification);
 
-            // TODO: 'updates' requires the Updates class port
+            $reportUpdates = $updates->getUpdatesBetweenReports(
+                $report->getTarget(),
+                $report->getConventId(),
+                ProductResourceType::LIMITED->value,
+                $previousVerification,
+                $report,
+            );
+
             return $this->json([
                 'report' => $report->getPartialAjaxData(),
-                'updates' => null,
+                'updates' => $reportUpdates,
             ]);
         }
 
@@ -164,7 +180,10 @@ class ReportsController extends DefaultController
     }
 
     /**
-     * Creates a new Report. Does not yet reproduce inventory/cash side effects - see class docblock.
+     * Creates a new Report. Verification reports save their row counts into the target
+     * inventory (and, if this is the most recent report and a cash difference is given, spin off
+     * a cash-out UPDATE report). Update reports move counts between the given source/target
+     * inventories.
      *
      * @throws Throwable
      * @throws NotFoundExceptionInterface
@@ -222,6 +241,16 @@ class ReportsController extends DefaultController
             ->setTarget($reportData['target'] ?? null)
         ;
 
+        if ($report->isUpdate()) {
+            if ($report->getSource() === null && $report->getTarget() === null) {
+                return JSendResponse::createFail('Kust ja kuhu ei tohi olla mõlemad tühjad', 400);
+            }
+
+            if ($report->getSource() === $report->getTarget()) {
+                return JSendResponse::createFail('Kust ja kuhu ei tohi olla samad', 400);
+            }
+        }
+
         foreach ($reportData['reportRows'] ?? [] as $rowData) {
             $product = isset($rowData['productId']) ? $productQuery->find($rowData['productId']) : null;
 
@@ -239,8 +268,87 @@ class ReportsController extends DefaultController
         }
 
         $em->persist($report);
+
+        if ($report->isUpdate()) {
+            // Remove from source inventory (warehouse and, in some cases, storage)
+            if ($report->getSource() !== null) {
+                $this->saveProductCounts($report, $report->getSource(), 'reduce', $em);
+            }
+
+            // Add to target inventory (warehouse or storage)
+            if ($report->getTarget() !== null) {
+                $this->saveProductCounts($report, $report->getTarget(), 'add', $em);
+            }
+        } else {
+            // A freshly created report is always "the latest" one
+            $cashOut = (float)$request->request->get('cashOut', 0);
+
+            if (abs($cashOut) > 0.001) {
+                $updateReport = new Report();
+                $updateReport
+                    ->setConvent($convent)
+                    ->setMember($user->getMember())
+                    ->setType(Report::TYPE_UPDATE)
+                    ->setTarget($report->getTarget() === Product::INVENTORY_TYPE_STORAGE ? Product::INVENTORY_TYPE_WAREHOUSE : null)
+                    ->setSource($report->getTarget())
+                    ->setCash((string)$cashOut)
+                ;
+                $em->persist($updateReport);
+            }
+
+            if ($report->getTarget() !== null) {
+                $this->saveProductCounts($report, $report->getTarget(), 'set', $em);
+            }
+        }
+
         $em->flush();
 
         return $this->json(['report' => $report], 201);
+    }
+
+    /**
+     * Applies the given Report's row counts to the target inventory (Product warehouse/storage
+     * count), either replacing ('set'), adding to, or subtracting from the current count.
+     *
+     * @throws BadRequestHttpException
+     */
+    private function saveProductCounts(Report $report, string $inventoryType, string $action, EntityManagerInterface $em): void
+    {
+        if (!in_array($action, ['set', 'add', 'reduce'], true)) {
+            throw new BadRequestHttpException('Invalid action for saveProductCounts: ' . $action);
+        }
+
+        foreach ($report->getReportRows() as $row) {
+            $product = $row->getProduct();
+            if ($product === null) {
+                continue;
+            }
+
+            $productInfo = $product->getActiveProductInfo();
+            $count = $row->getCount();
+
+            switch (strtolower($inventoryType)) {
+                case Product::INVENTORY_TYPE_WAREHOUSE:
+                    $current = $productInfo->getWarehouseCount() ?? 0;
+                    $productInfo->setWarehouseCount(match ($action) {
+                        'add' => $current + $count,
+                        'reduce' => $current - $count,
+                        default => $count,
+                    });
+                    break;
+                case Product::INVENTORY_TYPE_STORAGE:
+                    $current = $productInfo->getStorageCount() ?? 0;
+                    $productInfo->setStorageCount(match ($action) {
+                        'add' => $current + $count,
+                        'reduce' => $current - $count,
+                        default => $count,
+                    });
+                    break;
+                default:
+                    throw new BadRequestHttpException('Invalid inventoryType: ' . $inventoryType);
+            }
+
+            $em->persist($productInfo);
+        }
     }
 }

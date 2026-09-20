@@ -61,4 +61,52 @@ class ReportRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    /**
+     * Find the most recent verification report for the given convent/target, created before the
+     * given date (as opposed to findPreviousVerificationReport(), which takes a reference Report).
+     */
+    public function findLatestVerificationReportBefore(int $conventId, string $target, \DateTimeInterface $date): ?Report
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.type = :type')
+            ->andWhere('r.conventId = :conventId')
+            ->andWhere('r.target = :target')
+            ->andWhere('r.createdAt < :date')
+            ->setParameter('type', Report::TYPE_VERIFICATION)
+            ->setParameter('conventId', $conventId)
+            ->setParameter('target', $target)
+            ->setParameter('date', $date)
+            ->orderBy('r.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    /**
+     * Find UPDATE-type reports (deliveries/transfers between inventories) for the given convent,
+     * created strictly after dateFrom and up to and including dateUntil.
+     *
+     * @return Report[]
+     */
+    public function findUpdateReportsBetween(int $conventId, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateUntil): array
+    {
+        $query = $this->createQueryBuilder('r')
+            ->andWhere('r.type = :type')
+            ->andWhere('r.conventId = :conventId')
+            ->setParameter('type', Report::TYPE_UPDATE)
+            ->setParameter('conventId', $conventId)
+        ;
+
+        if ($dateFrom !== null) {
+            $query->andWhere('r.createdAt > :dateFrom')->setParameter('dateFrom', $dateFrom);
+        }
+
+        if ($dateUntil !== null) {
+            $query->andWhere('r.createdAt <= :dateUntil')->setParameter('dateUntil', $dateUntil);
+        }
+
+        return $query->getQuery()->getResult();
+    }
 }

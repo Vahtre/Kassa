@@ -67,6 +67,8 @@ class Report implements JsonSerializable
 
     private ?Report $previousVerification = null;
 
+    private ?float $deficit = null;
+
     public function __construct()
     {
         $this->reportRows = new ArrayCollection();
@@ -284,11 +286,24 @@ class Report implements JsonSerializable
     }
 
     /**
+     * Not persisted - the caller (e.g. Rotalia\API\Controller\ReportsController, using
+     * App\Service\Updates::calculateDeficit()) computes and sets this before serializing, since
+     * the calculation needs repository access an entity can't have.
+     */
+    public function setDeficit(?float $deficit): static
+    {
+        $this->deficit = $deficit;
+
+        return $this;
+    }
+
+    public function getDeficit(): ?float
+    {
+        return $this->deficit;
+    }
+
+    /**
      * Basic fields for the report.
-     *
-     * TODO: 'deficit' requires porting the old Propel Updates class (inventory delta
-     * calculation, see Rotalia\APIBundle\Classes\Updates on the master branch / pre-Doctrine
-     * git history) to Doctrine; stubbed to 0 until that follow-up lands.
      */
     public function jsonSerialize(): array
     {
@@ -300,7 +315,7 @@ class Report implements JsonSerializable
             'member' => $this->getMemberName(),
             'createdAt' => $this->getCreatedAt()?->format('H:i d.m.Y'),
             'cash' => $this->getCash(),
-            'deficit' => 0, // TODO: see class docblock
+            'deficit' => $this->getDeficit() ?? 0,
         ];
     }
 
