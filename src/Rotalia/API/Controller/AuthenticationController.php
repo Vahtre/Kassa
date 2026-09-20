@@ -3,24 +3,32 @@
 namespace Rotalia\API\Controller;
 
 use App\Entity\User;
+use App\Repository\PointOfSaleRepository;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use App\Component\HttpFoundation\JSendResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
+use Throwable;
 
 class AuthenticationController extends DefaultController
 {
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     #[Route('authentication', name: 'login_check', methods: ['GET'])]
     public function check(
+        PointOfSaleRepository $pointOfSaleQuery,
+        Request $request,
         #[CurrentUser] ?User $user,
     ): JsonResponse
     {
+        $pos = $this->getPos($request, $pointOfSaleQuery);
+
         $memberData = null;
         if ($user !== null) {
             $member = $user->getMember();
@@ -33,10 +41,20 @@ class AuthenticationController extends DefaultController
             ];
         }
 
-        return $this->json([
+        $response = $this->json([
             'member' => $memberData,
-            'pointOfSaleId' => null, // $pos ? $pos->getId() : null, // TODO: PointOfSale
+            'pointOfSaleId' => $pos?->getId(),
         ]);
+
+        if ($pos === null && $request->cookies->get('pos_hash')) {
+            // Delete a stale/invalid pos_hash cookie
+            $response->headers->setCookie(new Cookie('pos_hash', 'deleted', 1));
+        } elseif ($pos !== null) {
+            // Refresh cookie lifetime
+            $response->headers->setCookie(new Cookie('pos_hash', $pos->getHash(), new \DateTime('+1 year')));
+        }
+
+        return $response;
     }
 
     /**

@@ -338,10 +338,9 @@ class Report implements JsonSerializable
     }
 
     /**
-     * Basic ajax data with report rows.
-     *
-     * TODO: does not yet include inventory 'updates' between this and the next verification
-     * report; requires the Updates class port.
+     * Basic ajax data with report rows. Does not include the inventory 'updates' since the last
+     * verification report - callers add that separately as a sibling key
+     * (see Rotalia\API\Controller\ReportsController and App\Service\Updates).
      */
     public function getFullAjaxData(): array
     {

@@ -10,9 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
 /**
- * A snapshot of cross-convent credit balances, generated periodically by the (not yet ported)
- * `app:credit-netting` console command. Rows are only read/updated via the API; new
- * CreditNetting/CreditNettingRow records are not created through it.
+ * A snapshot of cross-convent credit balances, generated periodically by the
+ * `app:credit-netting` console command (App\Command\CreditNettingCommand). Rows are only
+ * read/updated via the API; new CreditNetting/CreditNettingRow records are not created through
+ * this controller.
  */
 #[ORM\Entity(repositoryClass: CreditNettingRepository::class)]
 #[ORM\Table(name: 'ollekassa_credit_netting')]
