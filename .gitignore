@@ -4,6 +4,9 @@
 /src/Rotalia/FrontendBundle/Resources/source/bower_components/
 /src/Rotalia/FrontendBundle/Resources/source/build/
 /composer.phar
+
+# Database dumps - these contain real member data, never commit them
+*.sql
 .idea/
 .directory
 .DS_Store
