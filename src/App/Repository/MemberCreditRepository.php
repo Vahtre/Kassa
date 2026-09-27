@@ -70,12 +70,12 @@ class MemberCreditRepository extends ServiceEntityRepository
     public function sumIncomingByConvent(array $activeConventIds): array
     {
         $rows = $this->createQueryBuilder('mc')
-            ->select('m.conventId as conventId, SUM(mc.credit) as total')
+            ->select('IDENTITY(m.convent) as conventId, SUM(mc.credit) as total')
             ->join('mc.member', 'm')
-            ->andWhere('m.conventId IN (:conventIds)')
+            ->andWhere('IDENTITY(m.convent) IN (:conventIds)')
             ->andWhere('mc.convent <> m.convent')
             ->setParameter('conventIds', $activeConventIds)
-            ->groupBy('m.conventId')
+            ->groupBy('IDENTITY(m.convent)')
             ->getQuery()
             ->getArrayResult()
         ;
@@ -101,7 +101,7 @@ class MemberCreditRepository extends ServiceEntityRepository
         $rows = $this->createQueryBuilder('mc')
             ->select('IDENTITY(mc.convent) as conventId, SUM(mc.credit) as total')
             ->join('mc.member', 'm')
-            ->andWhere('m.conventId IN (:conventIds)')
+            ->andWhere('IDENTITY(m.convent) IN (:conventIds)')
             ->andWhere('mc.convent <> m.convent')
             ->setParameter('conventIds', $activeConventIds)
             ->groupBy('mc.convent')

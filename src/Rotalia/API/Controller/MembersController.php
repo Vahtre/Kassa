@@ -39,7 +39,7 @@ class MembersController extends DefaultController
         }
 
         if (!empty($conventId)) {
-            $query->andWhere('m.conventId = :conventId')->setParameter('conventId', $conventId);
+            $query->andWhere('IDENTITY(m.convent) = :conventId')->setParameter('conventId', $conventId);
         }
 
         if (!empty($name)) {

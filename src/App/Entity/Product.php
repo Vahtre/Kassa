@@ -209,7 +209,14 @@ class Product implements JsonSerializable
 
         $productInfo = new ProductInfo();
         $productInfo->setConventId(self::$activeConventId);
-        $this->addProductInfo($productInfo);
+
+        // Only attach when a convent context is set. Otherwise (e.g. during
+        // fixture load, where setters like setSeq()/setStatus() may be called
+        // before ProductInfo rows are created) the phantom would cascade-persist
+        // with convent_id = NULL and fail the NOT NULL constraint.
+        if (self::$activeConventId !== null) {
+            $this->addProductInfo($productInfo);
+        }
 
         return $productInfo;
     }

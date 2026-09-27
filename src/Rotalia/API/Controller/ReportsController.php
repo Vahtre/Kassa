@@ -56,7 +56,7 @@ class ReportsController extends DefaultController
 
         $query = $reportQuery->createQueryBuilder('r');
         $query
-            ->andWhere('r.conventId = :conventId')
+            ->andWhere('IDENTITY(r.convent) = :conventId')
             ->setParameter('conventId', $activeConventId)
             ->orderBy('r.createdAt', 'DESC')
         ;

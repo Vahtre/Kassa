@@ -26,7 +26,7 @@ class TransactionRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('t')
             ->andWhere('t.type = :type')
-            ->andWhere('t.conventId = :conventId')
+            ->andWhere('IDENTITY(t.convent) = :conventId')
             ->setParameter('type', Transaction::TYPE_CREDIT_PURCHASE)
             ->setParameter('conventId', $conventId)
         ;

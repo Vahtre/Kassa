@@ -24,7 +24,7 @@ class MemberRepository extends ServiceEntityRepository
     {
         $rows = $this->createQueryBuilder('m')
             ->select('m.id')
-            ->andWhere('m.conventId IN (:conventIds)')
+            ->andWhere('IDENTITY(m.convent) IN (:conventIds)')
             ->setParameter('conventIds', $conventIds)
             ->getQuery()
             ->getScalarResult()

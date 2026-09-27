@@ -28,7 +28,7 @@ class GuardDutyRepository extends ServiceEntityRepository
         $guardDuties = $this->createQueryBuilder('gd')
             ->join('gd.guardDutyCycle', 'c')
             ->andWhere('gd.date = :date')
-            ->andWhere('c.conventId = :conventId')
+            ->andWhere('IDENTITY(c.convent) = :conventId')
             ->setParameter('date', $date)
             ->setParameter('conventId', $conventId)
             ->getQuery()

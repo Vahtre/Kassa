@@ -29,7 +29,7 @@ class ReportRepository extends ServiceEntityRepository
 
         return $this->createQueryBuilder('r')
             ->andWhere('r.type = :type')
-            ->andWhere('r.conventId = :conventId')
+            ->andWhere('IDENTITY(r.convent) = :conventId')
             ->andWhere('r.target = :target')
             ->andWhere('r.createdAt < :createdAt')
             ->setParameter('type', Report::TYPE_VERIFICATION)
@@ -50,7 +50,7 @@ class ReportRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->andWhere('r.type = :type')
-            ->andWhere('r.conventId = :conventId')
+            ->andWhere('IDENTITY(r.convent) = :conventId')
             ->andWhere('r.target = :target')
             ->setParameter('type', Report::TYPE_VERIFICATION)
             ->setParameter('conventId', $conventId)
@@ -70,7 +70,7 @@ class ReportRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->andWhere('r.type = :type')
-            ->andWhere('r.conventId = :conventId')
+            ->andWhere('IDENTITY(r.convent) = :conventId')
             ->andWhere('r.target = :target')
             ->andWhere('r.createdAt < :date')
             ->setParameter('type', Report::TYPE_VERIFICATION)
@@ -94,7 +94,7 @@ class ReportRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('r')
             ->andWhere('r.type = :type')
-            ->andWhere('r.conventId = :conventId')
+            ->andWhere('IDENTITY(r.convent) = :conventId')
             ->setParameter('type', Report::TYPE_UPDATE)
             ->setParameter('conventId', $conventId)
         ;

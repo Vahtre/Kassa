@@ -30,7 +30,7 @@ class ReportRowRepository extends ServiceEntityRepository
             ->join('rr.report', 'r')
             ->andWhere('rr.product = :productId')
             ->andWhere('r.type = :type')
-            ->andWhere('r.conventId = :conventId')
+            ->andWhere('IDENTITY(r.convent) = :conventId')
             ->andWhere('r.source IS NULL')
             ->setParameter('productId', $productId)
             ->setParameter('type', Report::TYPE_UPDATE)

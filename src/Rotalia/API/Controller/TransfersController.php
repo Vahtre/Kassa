@@ -55,14 +55,14 @@ class TransfersController extends DefaultController
             $query->andWhere('t.member = :memberId')->setParameter('memberId', $memberId);
 
             if ($conventId !== null) {
-                $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $conventId);
+                $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $conventId);
             }
         } elseif ($conventId === $memberConventId) {
             if (!$this->isGranted(User::ROLE_ADMIN)) {
                 return JSendResponse::createFail('Ainult admin saab pärida teiste ülekandeid', 403);
             }
 
-            $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $conventId);
+            $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $conventId);
 
             if ($memberId !== null) {
                 $query->andWhere('t.member = :memberId')->setParameter('memberId', $memberId);
@@ -73,7 +73,7 @@ class TransfersController extends DefaultController
             }
 
             if ($conventId !== null) {
-                $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $conventId);
+                $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $conventId);
             }
 
             if ($memberId !== null) {

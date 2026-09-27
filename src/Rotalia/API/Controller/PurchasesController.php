@@ -60,7 +60,7 @@ class PurchasesController extends DefaultController
                 return JSendResponse::createFail('Müügipunktist ei saa vaadata üksiku kasutaja oste', 403);
             }
 
-            $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $pos->getConventId());
+            $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $pos->getConventId());
 
             // Set other filtering by hand, matching kiosk-mode behaviour
             $dateFrom = (new \DateTime())->modify('-1 hour')->format('Y-m-d H:i:s');
@@ -77,14 +77,14 @@ class PurchasesController extends DefaultController
                 ;
 
                 if ($conventId !== null) {
-                    $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $conventId);
+                    $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $conventId);
                 }
             } elseif ($conventId === $memberConventId) {
                 if (!$this->isGranted(User::ROLE_ADMIN)) {
                     return JSendResponse::createFail('Ainult admin saab pärida teiste oste', 403);
                 }
 
-                $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $conventId);
+                $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $conventId);
 
                 if ($memberId !== null) {
                     $query
@@ -98,7 +98,7 @@ class PurchasesController extends DefaultController
                 }
 
                 if ($conventId !== null) {
-                    $query->andWhere('t.conventId = :conventId')->setParameter('conventId', $conventId);
+                    $query->andWhere('IDENTITY(t.convent) = :conventId')->setParameter('conventId', $conventId);
                 }
 
                 if ($memberId !== null) {

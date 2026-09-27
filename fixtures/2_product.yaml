@@ -13,21 +13,17 @@ App\Entity\Product:
         name: 'A le Coq Premium'
         product_code: '12345678'
         amountType: 'PIECE'
-        seq: '1'
         productGroup: '@ProductGroup_1'
     Product_2:
         name: 'A le Coq Aleksander'
         amountType: 'PIECE'
-        seq: '2'
         productGroup: '@ProductGroup_1'
     Product_3:
         name: 'A le Coq Pilsner'
         amountType: 'PIECE'
-        seq: '10'
     Product_4:
         name: 'Tuc Küpsis'
         amountType: 'PIECE'
-        seq: '43'
         productGroup: '@ProductGroup_2'
 # Note: Update ProductsControllerTest:testCreateSuccess id when adding new Products here
 

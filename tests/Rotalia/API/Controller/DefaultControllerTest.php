@@ -197,7 +197,7 @@ class DefaultControllerTest extends ControllerTestCase
         $user = new User();
         $mockContainer->method('get')->willReturn($user);
         $controller->setContainer($mockContainer);
-        $value = $controller->get('user');
+        $value = $controller->getService('user');
         $this->assertSame($user, $value);
     }
 }
