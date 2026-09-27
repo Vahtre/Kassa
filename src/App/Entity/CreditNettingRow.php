@@ -20,7 +20,7 @@ class CreditNettingRow implements JsonSerializable
     #[ORM\JoinColumn(name: 'credit_netting_id', nullable: false, onDelete: 'CASCADE')]
     private ?CreditNetting $creditNetting = null;
 
-    #[ORM\Column(name: 'convent_id')]
+    #[ORM\Column(name: 'convent_id', insertable: false, updatable: false)]
     private ?int $conventId = null;
 
     #[ORM\ManyToOne]
@@ -55,7 +55,7 @@ class CreditNettingRow implements JsonSerializable
         return $this->conventId;
     }
 
-    public function setConventId(int $conventId): static
+    public function setConventId(?int $conventId): static
     {
         $this->conventId = $conventId;
 

@@ -19,7 +19,7 @@ class PointOfSale implements JsonSerializable
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
-    #[ORM\Column(name: 'convent_id')]
+    #[ORM\Column(name: 'convent_id', insertable: false, updatable: false)]
     private ?int $conventId = 6;
 
     #[ORM\ManyToOne]
@@ -61,7 +61,7 @@ class PointOfSale implements JsonSerializable
         return $this->conventId;
     }
 
-    public function setConventId(int $conventId): static
+    public function setConventId(?int $conventId): static
     {
         $this->conventId = $conventId;
 

@@ -79,7 +79,7 @@ class AuthenticationController extends DefaultController
     #[Route('authentication', name: 'json_logout', methods: ['DELETE'])]
     public function logout(): JsonResponse
     {
-        $this->get('security.token_storage')->setToken(null);
+        $this->getService('security.token_storage')->setToken(null);
         return JSendResponse::createSuccess('Väljalogimine õnnestus');
     }
 }

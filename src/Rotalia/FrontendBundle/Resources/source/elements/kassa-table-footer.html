@@ -145,8 +145,9 @@
                 this.set('_hidden', true);
             },
 	        _onTap: function (e) {
-	            if (e.path[0].tagName = 'a') {
-					const number = Number(e.path[0].innerHTML);
+	            var target = Polymer.dom(e).rootTarget;
+	            if (target.tagName === 'A') {
+					const number = Number(target.innerHTML);
 					if (!isNaN(number)) {
 					    this.set('offset', (number - 1)*this._pageSize);
 					}

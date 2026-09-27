@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="kassa-page-behavior.html">
 <link rel="import" href="kassa-behavior.html">
@@ -11,6 +12,23 @@
 
 <dom-module id="kassa-admin-tootegrupid">
 	<template>
+
+		<kassa-material direction="horizontal">
+			<paper-button on-click="_confirmResetSeq" raised style="margin-left: auto; background: #d32f2f; color: white;">
+				Lähtesta järjekord
+			</paper-button>
+		</kassa-material>
+
+		<paper-dialog id="resetSeqDialog" modal style="max-width: 400px">
+			<kassa-material direction="vertical">
+				<h3 style="margin-top: 0">Hoiatus</h3>
+				<p>Kõikide tootegruppide järjekord seatakse väärtusele 99. Kas oled kindel?</p>
+			</kassa-material>
+			<div class="buttons">
+				<paper-button dialog-dismiss raised>Tühista</paper-button>
+				<paper-button on-click="_resetSeq" raised style="background: #d32f2f; color: white;">Lähtesta</paper-button>
+			</div>
+		</paper-dialog>
 
 		<kassa-table items="[[productGroups]]" edit-func="doProductGroupsPatch" add-func="doProductGroupsPost"
 		             dialog="[[dialog]]"
@@ -71,6 +89,18 @@
 	                onSuccess: function () {
 	                    this.fire('kassa-page-ready', {page: this})
 	                }.bind(this)
+                });
+            },
+            _confirmResetSeq: function () {
+                this.$.resetSeqDialog.open();
+            },
+            _resetSeq: function () {
+                this.$.resetSeqDialog.close();
+                this.fire('kassa-backend-action', {
+                    action: 'doProductGroupsResetSeq',
+                    onSuccess: function () {
+                        this.setUp();
+                    }.bind(this)
                 });
             }
         })

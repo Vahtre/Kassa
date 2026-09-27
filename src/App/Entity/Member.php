@@ -16,7 +16,7 @@ class Member
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'koondised_id')]
+    #[ORM\Column(name: 'koondised_id', insertable: false, updatable: false)]
     private int $conventId = -1;
 
     #[ORM\Column(name: 'eesnimi', length: 50, nullable: true)]

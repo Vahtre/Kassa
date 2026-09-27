@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Passwor
     #[ORM\Column(type: 'string', columnDefinition: "enum('mysql_old_password', 'mysql_native_password', 'plain')")]
     private ?string $plugin = self::PLUGIN_OLD_PASSWORD;
 
-    #[ORM\Column]
+    #[ORM\Column(insertable: false, updatable: false)]
     private ?int $liikmed_id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

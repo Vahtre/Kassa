@@ -22,7 +22,21 @@
 
         <kassa-material direction="horizontal">
             <paper-toggle-button checked="{{isActive}}">Aktiivsed tooted</paper-toggle-button>
+            <paper-button on-click="_confirmResetSeq" raised style="margin-left: auto; background: #d32f2f; color: white;">
+                Lähtesta järjekord
+            </paper-button>
         </kassa-material>
+
+        <paper-dialog id="resetSeqDialog" modal style="max-width: 400px">
+            <kassa-material direction="vertical">
+                <h3 style="margin-top: 0">Hoiatus</h3>
+                <p>Kõikide toodete järjekord seatakse väärtusele 99. Kas oled kindel?</p>
+            </kassa-material>
+            <div class="buttons">
+                <paper-button dialog-dismiss raised>Tühista</paper-button>
+                <paper-button on-click="_resetSeq" raised style="background: #d32f2f; color: white;">Lähtesta</paper-button>
+            </div>
+        </paper-dialog>
 
         <kassa-table items="[[_mapIdsToValues(products.*, productGroups)]]" edit-func="doProductsPatch" add-func="doProductsPost" dialog="[[dialog]]"
                      convent-id="[[conventId]]" scroll-target="[[scrollTarget]]" row-details-name="kassa-admin-tooted">
@@ -60,6 +74,12 @@
                     <span style="text-align: right;">[[eur2str(item.price)]]</span>
                 </template>
             </vaadin-grid-column>
+            <vaadin-grid-column flex-grow="0" width="5em">
+                <template class="header"><span style="text-align: right;">Järjekord</span></template>
+                <template>
+                    <span style="text-align: right;">[[item.seq]]</span>
+                </template>
+            </vaadin-grid-column>
         </kassa-table>
 
         <paper-dialog id="dialog" modal style="max-width: 350px">
@@ -74,7 +94,12 @@
                 </div>
                 <vaadin-combo-box data-field="productGroup" label="Grupp" item-label-path="name" item-value-path="id"
                                   items="[[productGroups]]"></vaadin-combo-box>
-                <paper-input data-field="price" label="Hind (€)" type="number" min="0" step="0.1"></paper-input>
+                <div style="display: flex; flex-flow: row nowrap; align-items: flex-end">
+                    <paper-input data-field="price" label="Hind (€)" type="number" min="0" step="0.1"
+                                 style="flex: 1 1 50%"></paper-input>
+                    <paper-input data-field="seq" label="Järjekord" type="number" min="1" step="1"
+                                 style="flex: 1 1 40%; margin-left: 0.8em"></paper-input>
+                </div>
                 <div style="display: flex; flex-flow: row nowrap; align-items: flex-end">
                     <paper-toggle-button data-field="resourceType" data-true-value="UNLIMITED"
                                          data-false-value="LIMITED">Lõputu?</paper-toggle-button>
@@ -144,6 +169,19 @@
                 }
 
                 return [];
+            },
+            _confirmResetSeq: function () {
+                this.$.resetSeqDialog.open();
+            },
+            _resetSeq: function () {
+                this.$.resetSeqDialog.close();
+                this.fire('kassa-backend-action', {
+                    action: 'doProductsResetSeq',
+                    conventId: this.conventId,
+                    onSuccess: function () {
+                        this._loadProducts(this.pageActive, this.isActive, this.conventId);
+                    }.bind(this)
+                });
             }
         })
     </script>

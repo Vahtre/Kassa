@@ -18,7 +18,7 @@ class UserRight
     #[ORM\Column(name: 'id_pk')]
     private ?int $idPk = null; // auto-increment PK is required
 
-    #[ORM\Column]
+    #[ORM\Column(insertable: false, updatable: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 10)]

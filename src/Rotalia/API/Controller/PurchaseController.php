@@ -138,8 +138,9 @@ class PurchaseController extends DefaultController
                     ->setType($transactionType)
                 ;
                 $em->persist($transaction);
-                // Credit balance changes the same way (positive cash = positive credit). This sum is deducted from balance
-                $totalSumCents = (int)round(100 * -$sum);
+                // Member pays cash into the register and receives credit.
+                // totalSumCents is positive so cash increases and credit increases.
+                $totalSumCents = (int)round(100 * $sum);
             } else {
                 foreach ($basket as $item) {
                     try {
@@ -173,7 +174,7 @@ class PurchaseController extends DefaultController
                 }
             }
 
-            // Reduce member credit
+            // Adjust member credit: purchases decrease it, refunds increase it
             if ($payment !== 'cash') {
                 $creditLimitEntity = $creditLimitQuery->findOneBy(['status' => $member->getStatus()]);
                 $creditLimit = $creditLimitEntity?->getCreditLimit();
@@ -185,8 +186,9 @@ class PurchaseController extends DefaultController
                 // conventId may differ from the member's own convent (e.g. super admin purchase elsewhere)
                 $convent ??= $em->getReference(Convent::class, $conventId);
 
+                $creditDelta = $payment === 'refund' ? $totalSumCents / 100 : -$totalSumCents / 100;
                 $memberCredit = $memberCreditQuery->findOrCreateForMemberAndConvent($member, $convent);
-                $memberCredit->adjustCredit(-$totalSumCents / 100, $creditLimit !== null ? (float)$creditLimit : null);
+                $memberCredit->adjustCredit($creditDelta, $creditLimit !== null ? (float)$creditLimit : null);
                 $em->persist($memberCredit);
             }
 

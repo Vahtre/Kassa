@@ -28,13 +28,13 @@ class ProductInfo
     private ?string $price = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?float $warehouseCount = null;
+    private ?string $warehouseCount = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?float $storageCount = null;
+    private ?string $storageCount = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private string $status = ProductStatus::DISABLED->value;
+    private ?string $status = ProductStatus::DISABLED->value;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $resourceType = ProductResourceType::LIMITED->value;
@@ -66,7 +66,7 @@ class ProductInfo
         return $this->conventId;
     }
 
-    public function setConventId(int $conventId): static
+    public function setConventId(?int $conventId): static
     {
         $this->conventId = $conventId;
 
@@ -87,24 +87,24 @@ class ProductInfo
 
     public function getWarehouseCount(): ?float
     {
-        return $this->warehouseCount;
+        return $this->warehouseCount === null ? null : (float)$this->warehouseCount;
     }
 
-    public function setWarehouseCount(?float $warehouseCount): static
+    public function setWarehouseCount(null|float|string $warehouseCount): static
     {
-        $this->warehouseCount = $warehouseCount;
+        $this->warehouseCount = $warehouseCount === null ? null : (string)(float)$warehouseCount;
 
         return $this;
     }
 
     public function getStorageCount(): ?float
     {
-        return $this->storageCount;
+        return $this->storageCount === null ? null : (float)$this->storageCount;
     }
 
-    public function setStorageCount(?float $storageCount): static
+    public function setStorageCount(null|float|string $storageCount): static
     {
-        $this->storageCount = $storageCount;
+        $this->storageCount = $storageCount === null ? null : (string)(float)$storageCount;
 
         return $this;
     }

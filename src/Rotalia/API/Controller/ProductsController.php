@@ -94,7 +94,13 @@ class ProductsController extends DefaultController
         /** @var Product[] $products */
         $products = $query->getQuery()->getResult();
 
-        $count = $query->select('count(distinct p.id)')->getQuery()->getSingleScalarResult();
+        $countQuery = clone $query;
+        $count = $countQuery->select('count(distinct p.id)')
+            ->resetDQLPart('orderBy')
+            ->setFirstResult(null)
+            ->setMaxResults(null)
+            ->getQuery()
+            ->getSingleScalarResult();
 
         return $this->json([
             'products' => $products,
@@ -192,6 +198,27 @@ class ProductsController extends DefaultController
         $this->requireAdmin();
 
         return FormHelper::submitForm($this->container, $request, $em, ProductType::class, $product);
+    }
+
+    #[Route('/products/resetSeq', methods: ['POST'])]
+    public function resetSeq(
+        EntityManagerInterface $em,
+        ProductRepository $productQuery,
+        Request $request,
+    ): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $conventId = $request->request->get('conventId');
+        $activeConventId = $this->setActiveConventId($conventId);
+
+        $productInfoTable = $em->getClassMetadata(ProductInfo::class)->getTableName();
+        $em->getConnection()->executeStatement(
+            "UPDATE $productInfoTable SET seq = 99 WHERE convent_id = :conventId",
+            ['conventId' => $activeConventId]
+        );
+
+        return $this->json(['message' => 'Toodete järjekord lähtestatud']);
     }
 
     private function setActiveConventId(?int $conventId): ?int

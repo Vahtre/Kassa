@@ -32,6 +32,10 @@
                    content-type="application/x-www-form-urlencoded"></iron-ajax>
         <iron-ajax id="productGroupsPatch" handle-as="json" url='[[_computeURL("productGroups", _id)]]' method="PATCH"
                    content-type="application/x-www-form-urlencoded"></iron-ajax>
+        <iron-ajax id="productsResetSeq" handle-as="json" url='[[_computeURL("products/resetSeq")]]' method="POST"
+                   content-type="application/x-www-form-urlencoded"></iron-ajax>
+        <iron-ajax id="productGroupsResetSeq" handle-as="json" url='[[_computeURL("productGroups/resetSeq")]]' method="POST"
+                   content-type="application/x-www-form-urlencoded"></iron-ajax>
         <!-- PointOfSales -->
         <iron-ajax id="pointOfSalesGet" handle-as="json" url='[[_computeURL("pointOfSales")]]' method="GET"
                    content-type="application/x-www-form-urlencoded"></iron-ajax>
@@ -176,20 +180,20 @@
                     password: password,
                     rememberMe: rememberMe,
                 }));
-                return this.$.authenticationPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.authenticationPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.fire('kassa-message-success', response.data);
                     return this.doAuthenticationGet();
                 }.bind(this));
             },
             doLogout: function () {
-                return this.$.authenticationDelete.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.authenticationDelete.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.fire('kassa-message-success', response.data);
                     this._setMember(null);
                     this._setSettings(null);
                 }.bind(this));
             },
             doAuthenticationGet: function () {
-                return this.$.authenticationGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.authenticationGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setMember(response.data.member);
                     if (response.data.member) {
                         this.doSettingsGet();
@@ -201,7 +205,7 @@
             },
             /* Settings */
             doSettingsGet: function () {
-                return this.$.settingsGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.settingsGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setSettings(response.data);
 
                     return response
@@ -214,20 +218,24 @@
                     isActive: isActive,
                     limit: 0
                 }));
-                return this.$.membersGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.membersGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setMembers(response.data.members);
 
                     return response.headers;
                 }.bind(this));
             },
             /* Products */
-            doProductsGet: function (conventId, isActive, resourceType) {
-                this.$.productsGet.set('params', this._formatBody({
+            doProductsGet: function (conventId, isActive, resourceType, limit) {
+                var params = {
                     conventId: conventId,
                     active: isActive,
                     resourceType: resourceType
-                }));
-                return this.$.productsGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                };
+                if (limit) {
+                    params.limit = limit;
+                }
+                this.$.productsGet.set('params', this._formatBody(params));
+                return this.$.productsGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setProducts(response.data.products);
 
                     return response.headers;
@@ -238,7 +246,7 @@
                     conventId: conventId,
                     product: productType,
                 }));
-                return this.$.productsPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.productsPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.push('products', response.data.product);
                     this.fire('kassa-message-success', 'Toode edukalt lisatud');
                 }.bind(this));
@@ -249,7 +257,7 @@
                     product: productType
                 }));
                 this.set('_id', productId);
-                return this.$.productsPatch.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.productsPatch.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     if (this._updateItems('products', this.products, response.data.product)) {
                         this.fire('kassa-message-success', 'Toode edukalt muudetud');
                     }
@@ -257,7 +265,7 @@
             },
             /* ProductGroups */
             doProductGroupsGet: function () {
-                return this.$.productGroupsGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.productGroupsGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setProductGroups(response.data.productGroups);
 
                     return response.headers;
@@ -267,7 +275,7 @@
                 this.$.productGroupsPost.set('body', this._formatBody({
                     productGroup: productGroup
                 }));
-                return this.$.productGroupsPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.productGroupsPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.push('productGroups', response.data.productGroup);
                     this.fire('kassa-message-success', 'Tootegrupp edukalt lisatud');
                 }.bind(this));
@@ -277,14 +285,27 @@
                     productGroup: productGroup
                 }));
                 this.set('_id', productGroupId);
-                return this.$.productGroupsPatch.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.productGroupsPatch.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._updateItems('productGroups', this.productGroups, response.data.productGroup);
                     this.fire('kassa-message-success', 'Tootegrupp edukalt muudetud');
                 }.bind(this));
             },
+            doProductsResetSeq: function (conventId) {
+                this.$.productsResetSeq.set('body', this._formatBody({
+                    conventId: conventId
+                }));
+                return this.$.productsResetSeq.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function () {
+                    this.fire('kassa-message-success', 'Toodete järjekord lähtestatud');
+                }.bind(this));
+            },
+            doProductGroupsResetSeq: function () {
+                return this.$.productGroupsResetSeq.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function () {
+                    this.fire('kassa-message-success', 'Tootegruppide järjekord lähtestatud');
+                }.bind(this));
+            },
             /* PointOfSales */
             doPointOfSalesGet: function () {
-                return this.$.pointOfSalesGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.pointOfSalesGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setPointOfSales(response.data.pointOfSales);
 
                     return response.headers;
@@ -295,7 +316,7 @@
                     conventId: conventId,
                     pointOfSale: pointOfSaleType
                 }));
-                return this.$.pointOfSalesPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.pointOfSalesPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.push('pointOfSales', response.data.pointOfSale);
                     this.fire('kassa-message-success', 'Müügipunkt edukalt lisatud');
                 }.bind(this));
@@ -305,14 +326,14 @@
                     pointOfSale: pointOfSaleType
                 }));
                 this.set('_id', pointOfSaleId);
-                return this.$.pointOfSalesPatch.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.pointOfSalesPatch.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._updateItems('pointOfSales', this.pointOfSales, response.data.pointOfSale);
                     this.fire('kassa-message-success', 'Müügipunkt edukalt muudetud');
                 }.bind(this));
             },
             doPointOfSalesDelete: function (pointOfSaleId) {
                 this.set('_id', pointOfSaleId);
-                return this.$.pointOfSalesDelete.generateRequest().completes.then(this._checkSuccess).then(function () {
+                return this.$.pointOfSalesDelete.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function () {
                     this._deleteItems('pointOfSales', this.pointOfSales, pointOfSaleId);
                     this.fire('kassa-message-success', 'Müügipunkt edukalt kustutatud');
                 }.bind(this));
@@ -329,7 +350,7 @@
                     limit: limit,
                     offset: offset
                 }));
-                return this.$.purchasesGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.purchasesGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setPurchases(response.data.purchases);
 
                     return response.headers;
@@ -341,7 +362,7 @@
                     memberId: memberId,
                     basket: basket
                 }));
-                return this.$.purchasePost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.purchasePost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.fire('kassa-message-success', 'Ost edukalt sooritatud');
                     if (memberId === this.member.id) {
                         this.set('member.creditBalance', response.data.newCredit);
@@ -356,7 +377,7 @@
                     target: target,
                     reportType: reportType
                 }));
-                return this.$.reportGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.reportGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setSingleReport(response.data.report);
                     this._setUpdates(response.data.updates);
 
@@ -375,7 +396,7 @@
                     limit: limit,
                     offset: offset
                 }));
-                return this.$.reportGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.reportGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setReports(response.data.reports);
 
                     return response.headers;
@@ -388,7 +409,7 @@
                     Report: Report,
                     cashOut: cashOut
                 }));
-                return this.$.reportsPost.generateRequest().completes.then(this._checkSuccess).then(function () {
+                return this.$.reportsPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function () {
                     this.fire('kassa-message-success', 'Aruanne edukalt lisatud');
                 }.bind(this));
             },
@@ -398,7 +419,7 @@
                     type: 'UPDATE',
                     Report: itemType
                 }));
-                return this.$.reportsPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.reportsPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.unshift('reports', response.data.report);
                     this.fire('kassa-message-success', 'Tarne edukalt lisatud');
                 }.bind(this));
@@ -414,7 +435,7 @@
                     limit: limit,
                     offset: offset
                 }));
-                return this.$.transfersGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.transfersGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setTransfers(response.data.transfers);
 
                     return response.headers;
@@ -425,7 +446,7 @@
                     conventId: conventId,
                     transfer: transferType
                 }));
-                return this.$.transfersPost.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.transfersPost.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this.unshift('transfers', response.data.transfer);
                     this.fire('kassa-message-success', 'Ülekanne edukalt lisatud');
                     return this.doAuthenticationGet();
@@ -433,7 +454,7 @@
             },
             /* CreditNettings */
             doCreditNettingsGet: function () {
-                return this.$.creditNettingsGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.creditNettingsGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setCreditNettings(response.data.creditNettings);
 
                     return response.headers;
@@ -445,14 +466,14 @@
                     conventId: conventId
                 }));
                 this.set('_id', creditNettingId);
-                return this.$.creditNettingsPatch.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.creditNettingsPatch.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._updateItems('creditNettings', this.creditNettings, response.data.creditNetting);
                     this.fire('kassa-message-success', 'Tasaarveldus edukalt muudetud');
                 }.bind(this));
             },
             /* Status credit limits */
             doCreditLimitsGet: function () {
-                return this.$.statusCreditLimitsGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.statusCreditLimitsGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setCreditLimits(response.data.creditLimits);
 
                     return response.headers;
@@ -464,7 +485,7 @@
                     this.$.statusCreditLimitsPatch.set('body', this._formatBody({
                         creditLimit: creditLimit['creditLimit']
                     }));
-                    return this.$.statusCreditLimitsPatch.generateRequest().completes.then(this._checkSuccess);
+                    return this.$.statusCreditLimitsPatch.generateRequest().completes.then(this._checkSuccess.bind(this));
                 }.bind(this))).then(function () {
                     this.fire('kassa-message-success', 'Krediidi limiidid edukalt määratud');
                 }.bind(this));
@@ -476,7 +497,7 @@
                     dateFrom: dateFrom,
                     dateUntil: dateUntil
                 }));
-                return this.$.economyReportGet.generateRequest().completes.then(this._checkSuccess).then(function (response) {
+                return this.$.economyReportGet.generateRequest().completes.then(this._checkSuccess.bind(this)).then(function (response) {
                     this._setEconomyReport(response.data);
                 }.bind(this));
             },
@@ -500,13 +521,16 @@
                         break;
                     /* Products */
                     case 'doProductsGet':
-                        promise = this.doProductsGet(data.conventId, data.isActive, data.resourceType);
+                        promise = this.doProductsGet(data.conventId, data.isActive, data.resourceType, data.limit);
                         break;
                     case 'doProductsPost':
                         promise = this.doProductsPost(data.conventId, data.itemType);
                         break;
                     case 'doProductsPatch':
                         promise = this.doProductsPatch(data.conventId, data.id, data.itemType);
+                        break;
+                    case 'doProductsResetSeq':
+                        promise = this.doProductsResetSeq(data.conventId);
                         break;
                     /* ProductGroups */
                     case 'doProductGroupsGet':
@@ -517,6 +541,9 @@
                         break;
                     case 'doProductGroupsPatch':
                         promise = this.doProductGroupsPatch(data.id, data.itemType);
+                        break;
+                    case 'doProductGroupsResetSeq':
+                        promise = this.doProductGroupsResetSeq();
                         break;
                     /* PointOfSales */
                     case 'doPointOfSalesGet':

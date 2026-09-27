@@ -21,7 +21,7 @@ class Transfer implements JsonSerializable
     #[ORM\JoinColumn(name: 'member_id', nullable: false)]
     private ?Member $member = null;
 
-    #[ORM\Column(name: 'convent_id')]
+    #[ORM\Column(name: 'convent_id', insertable: false, updatable: false)]
     private ?int $conventId = null;
 
     #[ORM\ManyToOne]
@@ -69,7 +69,7 @@ class Transfer implements JsonSerializable
         return $this->conventId;
     }
 
-    public function setConventId(int $conventId): static
+    public function setConventId(?int $conventId): static
     {
         $this->conventId = $conventId;
 

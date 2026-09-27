@@ -23,7 +23,7 @@ class MemberCredit
     #[ORM\JoinColumn(nullable: false)]
     private ?Member $member = null;
 
-    #[ORM\ManyToOne(inversedBy: 'memberCredits')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Convent $convent = null;
 

@@ -30,9 +30,10 @@ class ProductRepository extends ServiceEntityRepository
     public function orderBySeqForConvent(QueryBuilder $query, int $conventId): QueryBuilder
     {
         return $query
+            ->addSelect('COALESCE(seqInfo.seq, p.seq) AS HIDDEN sortSeq')
             ->leftJoin('p.productInfos', 'seqInfo', Join::WITH, 'seqInfo.conventId = :seqConventId')
             ->setParameter('seqConventId', $conventId)
-            ->addOrderBy('COALESCE(seqInfo.seq, p.seq)', 'ASC')
+            ->addOrderBy('sortSeq', 'ASC')
         ;
     }
 }

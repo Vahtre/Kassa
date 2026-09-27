@@ -175,7 +175,8 @@
                         action: 'doProductsGet',
 	                    isActive: true,
 	                    conventId: conventId,
-	                    resourceType: 'LIMITED'
+	                    resourceType: 'LIMITED',
+	                    limit: 500
                     });
                 }
 	        },
@@ -246,22 +247,9 @@
 					    mergedProducts.push(newProduct);
 					}
 
-                    // Prepare productGroups
-                    let productGroupIds = productGroups.map(productGroup => productGroup.id);
-
-                    // Sort products
+                    // Sort products by product seq
 					mergedProducts = mergedProducts.sort(function (a, b) {
-						let aIndx = productGroupIds.indexOf(a.productGroupId);
-						if (aIndx === -1) {
-						    aIndx = productGroupIds.length;
-						}
-
-                        let bIndx = productGroupIds.indexOf(b.productGroupId);
-                        if (bIndx === -1) {
-                            bIndx = productGroupIds.length;
-                        }
-
-                        return aIndx - bIndx;
+                        return (a.seq || 99) - (b.seq || 99);
                     });
 				}
 

@@ -132,6 +132,10 @@ class ReportsController extends DefaultController
             $conventId = (int)$request->query->get('conventId', $memberConventId);
             $target = $request->query->get('target', Product::INVENTORY_TYPE_STORAGE);
 
+            if ($conventId !== $memberConventId && !$this->isGranted(User::ROLE_SUPER_ADMIN)) {
+                return JSendResponse::createFail('Teise konvendi raporteid saab näha ainult super admin', 403);
+            }
+
             $report = $reportQuery->findLatestVerificationReport($conventId, $target);
 
             $reportUpdates = $report === null ? null : $updates->getUpdatesBetweenReports(
@@ -207,6 +211,8 @@ class ReportsController extends DefaultController
         if ($conventId !== $memberConventId && !$this->isGranted(User::ROLE_SUPER_ADMIN)) {
             return JSendResponse::createFail('Tegevuseks pead olema super admin', 403);
         }
+
+        Product::$activeConventId = $conventId;
 
         /** @var Convent|null $convent */
         $convent = $conventQuery->find($conventId);

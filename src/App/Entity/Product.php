@@ -39,10 +39,10 @@ class Product implements JsonSerializable
     private ?string $amountType = Enum\ProductAmountType::PIECE->value;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?float $amount = 1.00;
+    private ?string $amount = '1.00';
 
     #[ORM\Column(length: 50, nullable: true)]
-    private string $status; // TODO: remove from database
+    private ?string $status = null; // TODO: remove from database
 
     #[ORM\Column(nullable: true)]
     private ?int $seq = null; // TODO: remove from database
@@ -123,12 +123,12 @@ class Product implements JsonSerializable
 
     public function getAmount(): ?float
     {
-        return $this->amount;
+        return $this->amount === null ? null : (float)$this->amount;
     }
 
-    public function setAmount(?float $amount): static
+    public function setAmount(null|float|string $amount): static
     {
-        $this->amount = $amount;
+        $this->amount = $amount === null ? null : (string)(float)$amount;
 
         return $this;
     }

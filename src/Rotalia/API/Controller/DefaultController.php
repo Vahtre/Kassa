@@ -58,7 +58,7 @@ class DefaultController extends AbstractController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function get(string $service)
+    public function getService(string $service)
     {
         return $this->container->get($service);
     }
