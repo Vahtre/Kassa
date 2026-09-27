@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature/php8-migration-completion
   pull_request:
 
 jobs:
