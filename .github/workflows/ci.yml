@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  tests:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - '8.2'
+          - '8.3'
+
+    services:
+      # MariaDB 11.4, matching production. The app hashes passwords with the server-side
+      # PASSWORD() function (see Rotalia\API\Services\Security\MySqlPasswordHasher); MariaDB still
+      # provides it and returns the MySQL 4.1 format hash the tests assert, while MySQL 8.0
+      # removed the function entirely. Do not swap this for a mysql:8 image.
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      APP_ENV: test
+      # Real environment variables take precedence over .env/.env.test, so this is the
+      # connection the test run uses. doctrine.yaml appends the `_test` suffix under
+      # `when@test`, so the database actually created below is `kassa_test`.
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/kassa?serverVersion=mariadb-11.4.13'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ctype, iconv, json, pdo, pdo_mysql
+          coverage: none
+
+      - name: Resolve Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-php${{ matrix.php }}-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Create test database
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+
+      # migrations/ holds incremental changes against the legacy schema only - there is no
+      # baseline migration that creates the tables - so a fresh CI database is built from the
+      # entity mappings, and the migrations are then marked as applied rather than run (running
+      # them here would fail on columns schema:create has already created).
+      - name: Create test schema
+        run: php bin/console doctrine:schema:create --env=test
+
+      - name: Mark existing migrations as applied
+        run: php bin/console doctrine:migrations:version --add --all --no-interaction --env=test
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
