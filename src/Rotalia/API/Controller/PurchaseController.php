@@ -115,6 +115,12 @@ class PurchaseController extends DefaultController
             $conventId = (int)$request->request->get('conventId', $member->getConventId());
         }
 
+        // Every Transaction row needs a Convent (convent_id NOT NULL) and a createdBy Member
+        // (created_by NOT NULL). For POS-only cash purchases with no logged-in user, attribute the
+        // transaction to whoever set up the POS.
+        $transactionConvent = $em->getReference(Convent::class, $conventId);
+        $transactionCreator = $currentMember ?? $pos?->getCreatedBy();
+
         // Use integer cents for summing to avoid floating point issues
         $totalSumCents = 0;
 
@@ -132,9 +138,9 @@ class PurchaseController extends DefaultController
                 $transaction = new Transaction();
                 $transaction
                     ->setSum((string)$sum)
-                    ->setCreatedBy($currentMember)
+                    ->setCreatedBy($transactionCreator)
                     ->setMember($member)
-                    ->setConventId($conventId)
+                    ->setConvent($transactionConvent)
                     ->setType($transactionType)
                 ;
                 $em->persist($transaction);
@@ -162,9 +168,9 @@ class PurchaseController extends DefaultController
                         ->setCount((string)$item['count'])
                         ->setProduct($product)
                         ->setCurrentPrice((string)$product->getPrice())
-                        ->setCreatedBy($currentMember)
+                        ->setCreatedBy($transactionCreator)
                         ->setMember($member)
-                        ->setConventId($conventId)
+                        ->setConvent($transactionConvent)
                         ->setType($transactionType)
                     ;
                     $totalSumCents += (int)round(100 * $transaction->calculateSum());

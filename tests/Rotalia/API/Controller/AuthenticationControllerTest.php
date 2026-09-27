@@ -4,6 +4,7 @@ namespace Tests\Rotalia\API\Controller;
 
 use App\Entity\PointOfSale;
 use App\Entity\User;
+use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Rotalia\API\Controller\AuthenticationController;
 use Rotalia\API\Services\Security\AuthenticationFailureHandler;
@@ -20,6 +21,7 @@ use Tests\Helpers\EntityManagerAwareTestCase;
 class AuthenticationControllerTest extends ControllerTestCase
 {
     use EntityManagerAwareTestCase;
+    use RefreshDatabaseTrait;
 
     public function testCheckUnauthorized(): void
     {

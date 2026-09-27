@@ -67,7 +67,7 @@ class CreditNettingsController extends DefaultController
         }
 
         $creditNettingRow = $creditNettingRowQuery->findOneBy([
-            'conventId' => $conventId,
+            'convent' => $conventId,
             'creditNetting' => $id,
         ]);
 

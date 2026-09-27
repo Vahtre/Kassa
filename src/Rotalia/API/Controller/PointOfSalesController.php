@@ -40,7 +40,7 @@ class PointOfSalesController extends DefaultController
             $pointOfSales = $pointOfSaleQuery->findBy([], ['id' => 'ASC']);
         } else {
             $pointOfSales = $pointOfSaleQuery->findBy(
-                ['conventId' => $user->getMember()->getConventId()],
+                ['convent' => $user->getMember()->getConventId()],
                 ['id' => 'ASC']
             );
         }

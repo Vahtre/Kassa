@@ -75,7 +75,7 @@ class MemberCreditRepository extends ServiceEntityRepository
             ->andWhere('IDENTITY(m.convent) IN (:conventIds)')
             ->andWhere('mc.convent <> m.convent')
             ->setParameter('conventIds', $activeConventIds)
-            ->groupBy('IDENTITY(m.convent)')
+            ->groupBy('conventId')
             ->getQuery()
             ->getArrayResult()
         ;
