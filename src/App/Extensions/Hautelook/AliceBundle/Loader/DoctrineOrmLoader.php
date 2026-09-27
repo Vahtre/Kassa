@@ -31,7 +31,15 @@ class DoctrineOrmLoader extends BaseDoctrineOrmLoader
         foreach ($files as $file) {
             // Each load persists all objects to entity manager
             // Pass results to load() to allow referencing fixtures across files
-            $results += $loader->load([$file], $parameters, $results, $currentPurgeMode);
+            try {
+                $results += $loader->load([$file], $parameters, $results, $currentPurgeMode);
+            } catch (\Throwable $e) {
+                $msg = sprintf("Fixture loading failed on file: %s\n%s", $file, $e->getMessage());
+                foreach ($results as $key => $obj) {
+                    $msg .= sprintf("\n  [%s] %s #%s", $key, get_class($obj), method_exists($obj, 'getId') ? $obj->getId() : '?');
+                }
+                throw new \RuntimeException($msg, 0, $e);
+            }
 
             // Avoid any purges after the first fixtures have loaded
             $currentPurgeMode = PurgeMode::createNoPurgeMode();

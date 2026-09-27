@@ -82,13 +82,11 @@ jobs:
       - name: Mark existing migrations as applied
         run: php bin/console doctrine:migrations:version --add --all --no-interaction --env=test
 
-      - name: Debug schema
-        run: |
-          php bin/console doctrine:schema:validate --env=test || true
-          mysql -u root -proot -h 127.0.0.1 kassa_test -e "SHOW CREATE TABLE ollekassa_product_info\G" || true
-          mysql -u root -proot -h 127.0.0.1 kassa_test -e "SHOW CREATE TABLE ollekassa_transaction\G" || true
-          mysql -u root -proot -h 127.0.0.1 kassa_test -e "SHOW CREATE TABLE liikmed\G" || true
-          php bin/console hautelook:fixtures:load --no-interaction --env=test 2>&1 || true
+      - name: Validate schema
+        run: php bin/console doctrine:schema:validate --env=test || true
+
+      - name: Test fixture loading
+        run: php bin/console hautelook:fixtures:load --no-interaction --env=test -vvv 2>&1 || true
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit
