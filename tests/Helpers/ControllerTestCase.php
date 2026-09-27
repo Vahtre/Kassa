@@ -15,6 +15,11 @@ class ControllerTestCase extends WebTestCase
     protected function setUp(): void
     {
         self::$client = static::createClient();
+        // Hautelook's RefreshDatabaseTrait begins a transaction on kernel boot and rolls it back
+        // on kernel shutdown. KernelBrowser reboots the kernel between requests by default, so
+        // any writes a first request makes get rolled back before the second request sees them.
+        // Disable that reboot so tests can POST-then-GET within the same transaction.
+        self::$client->disableReboot();
         self::$client->followRedirects();
     }
 
