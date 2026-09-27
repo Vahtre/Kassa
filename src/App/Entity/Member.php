@@ -16,7 +16,6 @@ class Member
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'koondised_id', insertable: false, updatable: false)]
     private int $conventId = -1;
 
     #[ORM\Column(name: 'eesnimi', length: 50, nullable: true)]
@@ -64,7 +63,7 @@ class Member
 
     public function getConventId(): ?int
     {
-        return $this->conventId;
+        return $this->convent?->getId() ?? ($this->conventId >= 0 ? $this->conventId : null);
     }
 
     public function setConventId(int $conventId): static

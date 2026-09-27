@@ -37,7 +37,6 @@ class Transaction implements JsonSerializable
     #[ORM\JoinColumn(name: 'created_by', nullable: false)]
     private ?Member $createdBy = null;
 
-    #[ORM\Column(name: 'convent_id', insertable: false, updatable: false)]
     private ?int $conventId = null;
 
     #[ORM\ManyToOne]
@@ -137,7 +136,7 @@ class Transaction implements JsonSerializable
 
     public function getConventId(): ?int
     {
-        return $this->conventId;
+        return $this->conventId ?? $this->convent?->getId();
     }
 
     public function setConventId(?int $conventId): static

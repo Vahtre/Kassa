@@ -158,9 +158,10 @@ Scalar `$conventId` (or similar) and relationship `$convent` both mapped to the 
 database column without `insertable: false, updatable: false` on the Column attribute.
 Caused `doctrine:schema:validate` failures and potential data conflicts on flush.
 
-**Fix:** Added `insertable: false, updatable: false` to the scalar `#[ORM\Column]`
-attribute on all 9 entities, making the scalar property read-only (the relationship is the
-authoritative write path).
+**Fix:** Removed the `#[ORM\Column]` attribute from the scalar properties on all 9
+entities, making them plain PHP fields (not Doctrine-mapped). The ManyToOne relationship
+is the sole owner of the database column. Getters fall back to `$this->convent?->getId()`
+to support hydrated entities loaded from the database.
 
 ---
 

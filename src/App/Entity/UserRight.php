@@ -18,7 +18,6 @@ class UserRight
     #[ORM\Column(name: 'id_pk')]
     private ?int $idPk = null; // auto-increment PK is required
 
-    #[ORM\Column(insertable: false, updatable: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 10)]
@@ -38,7 +37,7 @@ class UserRight
 
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->id ?? $this->user?->getId();
     }
 
     public function getCode(): ?string
