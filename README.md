@@ -87,8 +87,10 @@ composer install
 Copy `.env.local.example` to `.env.local` and fill it in. The application reads three variables:
 
 * `DATABASE_URL` - for example
-  `mysql://root:<password>@127.0.0.1:3306/kassa?serverVersion=mariadb-11.4.3`. The `serverVersion`
-  must carry the `mariadb-` prefix, otherwise Doctrine generates SQL for the wrong platform.
+  `mysql://root:<password>@127.0.0.1:3306/kassa?serverVersion=11.4.3-MariaDB`. The `serverVersion`
+  must include `MariaDB` (matching the string the server reports), otherwise Doctrine generates
+  SQL for the wrong platform. The older `mariadb-11.4.3` form still works but is deprecated in
+  DBAL 3 and removed in DBAL 4.
 * `APP_SECRET` - any random string locally.
 * `CORS_ALLOW_ORIGIN` - a regex, for example `^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$`.
 
@@ -199,7 +201,7 @@ mariadb -u root -p kassa_dump < dump.sql
 Point the application at it by editing `DATABASE_URL` in `.env.local`:
 
 ```
-DATABASE_URL="mysql://root:<password>@127.0.0.1:3306/kassa_dump?serverVersion=mariadb-11.4.3"
+DATABASE_URL="mysql://root:<password>@127.0.0.1:3306/kassa_dump?serverVersion=11.4.3-MariaDB"
 ```
 
 A dump carries the legacy schema, which is exactly the case the migrations are written for - so

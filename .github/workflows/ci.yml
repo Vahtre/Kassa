@@ -40,7 +40,7 @@ jobs:
       # Real environment variables take precedence over .env/.env.test, so this is the
       # connection the test run uses. doctrine.yaml appends the `_test` suffix under
       # `when@test`, so the database actually created below is `kassa_test`.
-      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/kassa?serverVersion=mariadb-11.4.13'
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/kassa?serverVersion=11.4.13-MariaDB'
 
     steps:
       - uses: actions/checkout@v4
