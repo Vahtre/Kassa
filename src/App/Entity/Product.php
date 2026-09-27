@@ -53,7 +53,7 @@ class Product implements JsonSerializable
     #[ORM\OneToMany(targetEntity: ProductInfo::class, mappedBy: 'product', cascade: ['persist'], orphanRemoval: true)]
     private Collection $productInfos;
 
-    public static ?int $activeConventId;
+    public static ?int $activeConventId = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     private ?ProductGroup $productGroup = null;
