@@ -152,7 +152,11 @@ class Product implements JsonSerializable
 
     public function setSeq(?int $seq): static
     {
-        $this->getActiveProductInfo()->setSeq($seq);
+        // Skip nulls so a form that doesn't submit `seq` (e.g. product create) doesn't overwrite
+        // the ProductInfo default of 1. Explicit reordering always passes an int.
+        if ($seq !== null) {
+            $this->getActiveProductInfo()->setSeq($seq);
+        }
 
         return $this;
     }

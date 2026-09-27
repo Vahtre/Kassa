@@ -58,6 +58,15 @@ class ProductInfo
     {
         $this->product = $product;
 
+        // Keep the inverse side in sync. Alice fixtures only call setProduct() on the owning
+        // side, so without this the Product's productInfos collection stays empty in memory
+        // (Doctrine won't lazy-load it later because the entity is already in the identity map
+        // with an unwrapped ArrayCollection). getActiveProductInfo() would then miss the real
+        // row, create a phantom, and cascade-persist a duplicate.
+        if ($product !== null) {
+            $product->addProductInfo($this);
+        }
+
         return $this;
     }
 
