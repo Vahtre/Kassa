@@ -142,7 +142,7 @@ class PointOfSale implements JsonSerializable
             'deviceInfo' => $this->getDeviceInfo(),
             'convent' => $this->getConvent()?->getName(),
             'createdAt' => $this->getCreatedAt()?->format('H:i d.m.Y'),
-            'createdBy' => Member::displayNameOf($this->getCreatedBy()),
+            'createdBy' => $this->getCreatedBy()?->getFullName(),
         ];
     }
 }

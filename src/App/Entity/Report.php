@@ -108,7 +108,7 @@ class Report implements JsonSerializable
 
     public function getMemberName(): string
     {
-        return Member::fullNameOf($this->getMember()) ?? $this->getName();
+        return $this->getMember()?->getFullName() ?? $this->getName();
     }
 
     public function getConventId(): ?int

@@ -228,8 +228,8 @@ class Transaction implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'member' => Member::displayNameOf($this->getMember()),
-            'createdBy' => Member::displayNameOf($this->getCreatedBy()),
+            'member' => $this->getMember()?->getFullName(),
+            'createdBy' => $this->getCreatedBy()?->getFullName(),
             'count' => $this->getCount() !== null ? (int)$this->getCount() : null,
             'price' => $this->getCurrentPrice(),
             'product' => $this->getProduct()?->jsonSerialize(),

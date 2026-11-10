@@ -146,11 +146,11 @@ class Transfer implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'member' => Member::displayNameOf($this->getMember()),
+            'member' => $this->getMember()?->getFullName(),
             'convent' => $this->getConvent()?->getName(),
             'sum' => $this->getSum(),
             'createdAt' => $this->getCreatedAt()?->format('H:i d.m.Y'),
-            'createdBy' => Member::displayNameOf($this->getCreatedBy()),
+            'createdBy' => $this->getCreatedBy()?->getFullName(),
             'comment' => $this->getComment(),
         ];
     }

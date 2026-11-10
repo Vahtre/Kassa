@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\MemberRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
@@ -101,29 +100,6 @@ class Member
     public function getFullName(): string
     {
         return implode(' ', [$this->getFirstName(), $this->getLastName()]);
-    }
-
-    /**
-     * Full name, or null when the referenced liikmed row does not exist (e.g. partial local data dumps).
-     */
-    public static function fullNameOf(?Member $member): ?string
-    {
-        try {
-            return $member?->getFullName();
-        } catch (EntityNotFoundException) {
-            return null;
-        }
-    }
-
-    public static function displayNameOf(?Member $member): ?string
-    {
-        if ($member === null) {
-            return null;
-        }
-        // Read the id first: a proxy whose load failed retries (and throws) on any later access
-        $id = $member->getId();
-
-        return self::fullNameOf($member) ?? 'Tundmatu liige #' . $id;
     }
 
     public function getTotalCredit(): float
