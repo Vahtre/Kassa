@@ -217,7 +217,7 @@
             observers: [
                 'loadProducts(pageActive, conventId)',
 	            'loadEconomyReport(pageActive, conventId, _startDate, _endDate)',
-	            'computeCash(limitedProfit, unlimitedProfit)'
+	            'computeCash(economyReport, limitedProfit, unlimitedProfit)'
             ],
             setUp: function () {
                 this.loadEconomyReport();
@@ -339,6 +339,9 @@
                 }
             },
             computeCash: function() {
+                if (!this.economyReport || !this.economyReport['cash']) {
+                    return;
+                }
                 let initialCash = this.economyReport['cash']['storage']['initial'] + this.economyReport['cash']['warehouse']['initial'];
                 let finalCash = this.economyReport['cash']['storage']['final'] + this.economyReport['cash']['warehouse']['final'];
                 let cashChange = (this.economyReport['cash']['storage']['out'] - this.economyReport['cash']['storage']['internal_out']) -
