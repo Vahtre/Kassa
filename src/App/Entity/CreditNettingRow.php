@@ -51,7 +51,7 @@ class CreditNettingRow implements JsonSerializable
 
     public function getConventId(): ?int
     {
-        return $this->conventId ?? $this->convent?->getId();
+        return $this->convent?->getId() ?? $this->conventId;
     }
 
     public function setConventId(?int $conventId): static

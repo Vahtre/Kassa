@@ -136,7 +136,7 @@ class Transaction implements JsonSerializable
 
     public function getConventId(): ?int
     {
-        return $this->conventId ?? $this->convent?->getId();
+        return $this->convent?->getId() ?? $this->conventId;
     }
 
     public function setConventId(?int $conventId): static
@@ -228,8 +228,8 @@ class Transaction implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'member' => $this->getMember()?->getFullName(),
-            'createdBy' => $this->getCreatedBy()?->getFullName(),
+            'member' => Member::displayNameOf($this->getMember()),
+            'createdBy' => Member::displayNameOf($this->getCreatedBy()),
             'count' => $this->getCount() !== null ? (int)$this->getCount() : null,
             'price' => $this->getCurrentPrice(),
             'product' => $this->getProduct()?->jsonSerialize(),

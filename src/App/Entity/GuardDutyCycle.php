@@ -26,7 +26,7 @@ class GuardDutyCycle
     #[ORM\Column(name: 'valvajad', length: 10)]
     private ?string $guardians = 'koik';
 
-    private ?int $conventId = 0;
+    private ?int $conventId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'koondised_id', nullable: false)]
@@ -72,7 +72,7 @@ class GuardDutyCycle
 
     public function getConventId(): ?int
     {
-        return $this->conventId ?? $this->convent?->getId();
+        return $this->convent?->getId() ?? $this->conventId;
     }
 
     public function setConventId(?int $conventId): static

@@ -65,7 +65,7 @@ class Transfer implements JsonSerializable
 
     public function getConventId(): ?int
     {
-        return $this->conventId ?? $this->convent?->getId();
+        return $this->convent?->getId() ?? $this->conventId;
     }
 
     public function setConventId(?int $conventId): static
@@ -146,11 +146,11 @@ class Transfer implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'member' => $this->getMember()?->getFullName(),
+            'member' => Member::displayNameOf($this->getMember()),
             'convent' => $this->getConvent()?->getName(),
             'sum' => $this->getSum(),
             'createdAt' => $this->getCreatedAt()?->format('H:i d.m.Y'),
-            'createdBy' => $this->getCreatedBy()?->getFullName(),
+            'createdBy' => Member::displayNameOf($this->getCreatedBy()),
             'comment' => $this->getComment(),
         ];
     }

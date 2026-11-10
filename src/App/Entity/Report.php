@@ -34,7 +34,7 @@ class Report implements JsonSerializable
     #[ORM\JoinColumn(name: 'member_id', nullable: true)]
     private ?Member $member = null;
 
-    private ?int $conventId = 6;
+    private ?int $conventId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'convent_id', nullable: false)]
@@ -108,12 +108,12 @@ class Report implements JsonSerializable
 
     public function getMemberName(): string
     {
-        return $this->getMember()?->getFullName() ?? $this->getName();
+        return Member::fullNameOf($this->getMember()) ?? $this->getName();
     }
 
     public function getConventId(): ?int
     {
-        return $this->conventId ?? $this->convent?->getId();
+        return $this->convent?->getId() ?? $this->conventId;
     }
 
     public function setConventId(?int $conventId): static

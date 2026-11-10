@@ -19,7 +19,7 @@ class PointOfSale implements JsonSerializable
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
-    private ?int $conventId = 6;
+    private ?int $conventId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'convent_id', nullable: false)]
@@ -57,7 +57,7 @@ class PointOfSale implements JsonSerializable
 
     public function getConventId(): ?int
     {
-        return $this->conventId ?? $this->convent?->getId();
+        return $this->convent?->getId() ?? $this->conventId;
     }
 
     public function setConventId(?int $conventId): static
@@ -142,7 +142,7 @@ class PointOfSale implements JsonSerializable
             'deviceInfo' => $this->getDeviceInfo(),
             'convent' => $this->getConvent()?->getName(),
             'createdAt' => $this->getCreatedAt()?->format('H:i d.m.Y'),
-            'createdBy' => $this->getCreatedBy()?->getFullName(),
+            'createdBy' => Member::displayNameOf($this->getCreatedBy()),
         ];
     }
 }
