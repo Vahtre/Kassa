@@ -25,7 +25,6 @@ App\Entity\Product:
         name: 'Tuc Küpsis'
         amountType: 'PIECE'
         productGroup: '@ProductGroup_2'
-# Note: Update ProductsControllerTest:testCreateSuccess id when adding new Products here
 
 App\Entity\ProductInfo:
     ProductInfo_1:

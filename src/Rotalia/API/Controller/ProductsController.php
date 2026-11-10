@@ -45,19 +45,29 @@ class ProductsController extends DefaultController
         #[MapQueryParameter] ?int $productGroup = null,
         #[MapQueryParameter] ?string $active = null,
         #[MapQueryParameter] int $page = 1,
-        #[MapQueryParameter] int $limit = 10,
+        #[MapQueryParameter] int $limit = 0,
         #[MapQueryParameter] int $conventId = null,
+        #[MapQueryParameter] ?string $resourceType = null,
     ): JsonResponse
     {
         $activeConventId = $this->setActiveConventId($conventId);
 
-        $offset = ($page - 1) * $limit;
         $query = $productQuery->createQueryBuilder('p');
         $productQuery->orderBySeqForConvent($query, $activeConventId);
-        $query
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-        ;
+        // limit=0 returns every product; the frontend relies on this for full product lists
+        if ($limit > 0) {
+            $query
+                ->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit)
+            ;
+        }
+
+        if ($resourceType !== null) {
+            $query
+                ->andWhere('seqInfo.resourceType = :resourceType')
+                ->setParameter('resourceType', $resourceType)
+            ;
+        }
 
         if ($active !== null) {
             $query
@@ -105,7 +115,7 @@ class ProductsController extends DefaultController
         return $this->json([
             'products' => $products,
             'page' => $page,
-            'pages' => ceil((int)$count / $limit),
+            'pages' => $limit > 0 ? (int)ceil((int)$count / $limit) : 1,
         ]);
     }
 

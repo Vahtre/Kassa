@@ -98,6 +98,54 @@ class ProductsControllerTest extends ControllerTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function testListReturnsAllProductsWithoutLimit(): void
+    {
+        $this->loginSimpleUser();
+        for ($i = 0; $i < 10; $i++) {
+            $this->entityManager->persist(
+                (new Product())->setName("Extra $i")->setPrice('1.00')->setAmountType(ProductAmountType::PIECE->value)
+            );
+        }
+        $this->entityManager->flush();
+
+        static::$client->request('GET', '/api/products');
+
+        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
+        $this->assertResponseCountJsonPath(14, 'data.products');
+        $this->assertResponseEqualsJsonPath(1, 'data.pages');
+    }
+
+    public function testListPaginatesWithLimit(): void
+    {
+        $this->loginSimpleUser();
+
+        static::$client->request('GET', '/api/products', ['limit' => 3, 'page' => 2]);
+
+        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
+        $this->assertResponseCountJsonPath(1, 'data.products');
+        $this->assertResponseEqualsJsonPath(2, 'data.pages');
+    }
+
+    public function testListFilterResourceType(): void
+    {
+        $this->loginSimpleUser();
+        $tartu = FixtureStore::getFixtures()['Convent_7'];
+        /** @var ProductInfo $tucTartu */
+        $tucTartu = $this->entityManager->find(ProductInfo::class, FixtureStore::getFixtures()['ProductInfo_8']->getId());
+        $tucTartu->setResourceType(ProductResourceType::UNLIMITED->value);
+        $this->entityManager->flush();
+
+        static::$client->request('GET', '/api/products', [
+            'active' => 1,
+            'conventId' => $tartu->getId(),
+            'resourceType' => ProductResourceType::LIMITED->value,
+        ]);
+
+        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
+        $this->assertResponseEqualsJsonPath('A le Coq Premium', 'data.products.0.name');
+        $this->assertResponseCountJsonPath(1, 'data.products');
+    }
+
     public function testListFilterName(): void
     {
         $this->loginSimpleUser();
@@ -176,6 +224,8 @@ class ProductsControllerTest extends ControllerTestCase
             ],
         ]);
         $response = static::$client->getResponse();
+        $created = $this->entityManager->getRepository(Product::class)->findOneBy(['name' => 'New Product']);
+        $this->assertNotNull($created);
         $this->assertResponseEqualsJsonPath([
             'name' => 'New Product',
             'price' => 2.33,
@@ -188,7 +238,7 @@ class ProductsControllerTest extends ControllerTestCase
             'warehouseCount' => null,
             'storageCount' => null,
             'seq' => 1, // Default seq for the newly created Tartu ProductInfo
-            'id' => 5, // Update when adding Products to 2_product.yaml
+            'id' => $created->getId(),
         ], 'data.product');
         $this->assertEquals(201, $response->getStatusCode());
     }
